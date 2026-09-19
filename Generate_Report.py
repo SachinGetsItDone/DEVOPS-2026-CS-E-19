@@ -47,7 +47,7 @@ def get_git_metrics(interval="weekly"):
     Supported intervals: 'weekly', 'monthly', 'final'
     """
     today = datetime.date.today()
-    git_args = ['git', 'log', '--no-merges', '--pretty=format:COMMIT|||%h|||%an|||%ad|||%s', '--date=short', '--numstat']
+    git_args = ['git', 'log', '--no-merges', '--pretty=format:COMMIT|||%h|||%an|||%ae|||%ad|||%s', '--date=short', '--numstat']
     
     if interval == "weekly":
         since_date = (today - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
@@ -66,6 +66,30 @@ def get_git_metrics(interval="weekly"):
         print("[ERROR] Git command failed. Please ensure you are inside a Git repository.")
         return None, None, None, scope_title
 
+    lines = raw_output.strip().split('\n')
+
+    # ---- Build a canonical display name per author email ----
+    # The same person can show up under different git user.name values on
+    # different machines (e.g. a GitHub Codespace default identity like
+    # "RiyaGiyamalani" vs a locally configured "Riya Giyamalani"), even
+    # though every commit shares the same email address. Group by email so
+    # each teammate is only counted once, preferring whichever name looks
+    # like a real "First Last" (i.e. contains a space) as the display name.
+    email_to_name = {}
+    for line in lines:
+        line = line.strip()
+        if not line.startswith('COMMIT|||'):
+            continue
+        parts = line.split('|||', 5)
+        if len(parts) < 6:
+            continue
+        author, email = parts[2].strip(), parts[3].strip().lower()
+        if "bot" in author.lower() or "github-actions" in author.lower():
+            continue
+        existing = email_to_name.get(email)
+        if existing is None or (' ' in author and ' ' not in existing):
+            email_to_name[email] = author
+
     students = defaultdict(lambda: {"commits": 0, "added": 0, "deleted": 0, "active_days": set()})
     timeline_activity = defaultdict(lambda: defaultdict(int))
     student_logs = defaultdict(list)
@@ -73,27 +97,28 @@ def get_git_metrics(interval="weekly"):
     current_author = None
     current_date_str = None
 
-    for line in raw_output.strip().split('\n'):
+    for line in lines:
         line = line.strip()
         if not line:
             continue
             
         if line.startswith('COMMIT|||'):
-            parts = line.split('|||')
-            if len(parts) >= 5:
+            parts = line.split('|||', 5)
+            if len(parts) >= 6:
                 sha = parts[1].strip()
-                author = parts[2].strip()
-                date_str = parts[3].strip()
-                msg = parts[4].strip()
+                raw_author = parts[2].strip()
+                email = parts[3].strip().lower()
+                date_str = parts[4].strip()
+                msg = parts[5].strip()
             else:
                 continue
             
             # Exclude bot commits from metric calculations
-            if "bot" in author.lower() or "github-actions" in author.lower():
+            if "bot" in raw_author.lower() or "github-actions" in raw_author.lower():
                 current_author = None
                 continue
             
-            current_author = author
+            current_author = email_to_name.get(email, raw_author)
             current_date_str = date_str
             
             students[current_author]["commits"] += 1
