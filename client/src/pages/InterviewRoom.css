@@ -136,6 +136,18 @@
   font-size: 14px;
 }
 
+.room__error {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--danger);
+  font-family: var(--font-mono);
+  line-height: 1.5;
+}
+
+.transcript__line--pending {
+  opacity: 0.6;
+}
+
 .panel--transcript {
   display: flex;
   flex-direction: column;

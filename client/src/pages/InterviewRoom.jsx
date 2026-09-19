@@ -1,21 +1,41 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterviewSession } from '../context/InterviewSessionContext.jsx'
+import { submitTurn, ApiError } from '../lib/api.js'
 import './InterviewRoom.css'
 
 export default function InterviewRoom() {
   const { session, clearSession } = useInterviewSession()
   const navigate = useNavigate()
+
   const [isRecording, setIsRecording] = useState(false)
-  const [transcript, setTranscript] = useState([
-    { speaker: 'ai', text: 'Welcome — whenever you\'re ready, click "Start answering" and walk me through your background.' },
-  ])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [turnError, setTurnError] = useState('')
+  const [transcript, setTranscript] = useState([])
+
+  const mediaRecorderRef = useRef(null)
+  const chunksRef = useRef([])
+  const audioPlayerRef = useRef(null)
   const transcriptEndRef = useRef(null)
 
   // Guard: you can't land here without having gone through the modal.
   useEffect(() => {
     if (!session) navigate('/')
   }, [session, navigate])
+
+  // Seed the transcript with the real opening question from the backend
+  // once the session is available.
+  useEffect(() => {
+    if (session) {
+      setTranscript([
+        {
+          speaker: 'ai',
+          text: session.openingQuestion
+            || 'Welcome — whenever you\'re ready, click "Start answering" and walk me through your background.',
+        },
+      ])
+    }
+  }, [session])
 
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -24,14 +44,82 @@ export default function InterviewRoom() {
   if (!session) return null
 
   function handleEndInterview() {
+    // Stop any in-flight recording so the mic is released cleanly.
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop()
+    }
     clearSession()
     navigate('/')
   }
 
-  // Placeholder — replace with the real call to the ML teammate's
-  // question-generation / speech endpoint once it's ready.
-  function handleToggleRecording() {
-    setIsRecording((prev) => !prev)
+  function playInterviewerAudio(base64Audio) {
+    if (!base64Audio || !audioPlayerRef.current) return
+    audioPlayerRef.current.src = `data:audio/wav;base64,${base64Audio}`
+    audioPlayerRef.current.play().catch(() => {
+      // Autoplay can be blocked before the user has interacted with the
+      // page; not fatal, the text is already in the transcript.
+    })
+  }
+
+  async function sendTurn({ audioBlob, transcriptText }) {
+    setIsProcessing(true)
+    setTurnError('')
+    try {
+      const result = await submitTurn({
+        interviewId: session.interviewId,
+        audioBlob,
+        transcript: transcriptText,
+        resumeContext: session.resumeText,
+      })
+
+      setTranscript((prev) => [
+        ...prev,
+        { speaker: 'user', text: result.user_transcript || transcriptText || '(No speech detected)' },
+        { speaker: 'ai', text: result.response_text || "Let's move on to the next question." },
+      ])
+      playInterviewerAudio(result.sts_audio_base64)
+    } catch (err) {
+      setTurnError(err instanceof ApiError ? err.message : 'Could not reach the interviewer. Try again.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  async function handleToggleRecording() {
+    if (isProcessing) return
+
+    if (isRecording) {
+      mediaRecorderRef.current?.stop()
+      setIsRecording(false)
+      return
+    }
+
+    setTurnError('')
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      chunksRef.current = []
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop())
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        sendTurn({ audioBlob })
+      }
+
+      mediaRecorderRef.current = recorder
+      recorder.start()
+      setIsRecording(true)
+    } catch (err) {
+      setTurnError('Microphone access was blocked. Allow mic access to answer out loud, or use "Skip question".')
+    }
+  }
+
+  function handleSkip() {
+    if (isProcessing || isRecording) return
+    sendTurn({ transcriptText: '(Candidate skipped this question.)' })
   }
 
   return (
@@ -61,18 +149,23 @@ export default function InterviewRoom() {
           <div className="panel panel--ai">
             <span className="eyebrow">Interviewer</span>
             <div className="panel__avatar panel__avatar--ai">AI</div>
-            <span className="panel__status">Ready</span>
+            <span className="panel__status">{isProcessing ? 'Thinking…' : 'Ready'}</span>
           </div>
 
           <div className="action-buttons">
             <button
               className={`btn-record ${isRecording ? 'btn-record--active' : ''}`}
               onClick={handleToggleRecording}
+              disabled={isProcessing}
             >
               {isRecording ? 'Stop answering' : 'Start answering'}
             </button>
-            <button className="btn-secondary">Skip question</button>
+            <button className="btn-secondary" onClick={handleSkip} disabled={isProcessing || isRecording}>
+              Skip question
+            </button>
           </div>
+
+          {turnError && <p className="room__error">{turnError}</p>}
         </div>
 
         <div className="panel panel--transcript">
@@ -88,10 +181,19 @@ export default function InterviewRoom() {
                 {line.text}
               </p>
             ))}
+            {isProcessing && (
+              <p className="transcript__line transcript__line--ai transcript__line--pending">
+                <span className="transcript__speaker">Interviewer</span>
+                Thinking…
+              </p>
+            )}
             <div ref={transcriptEndRef} />
           </div>
         </div>
       </div>
+
+      {/* Hidden player for the interviewer's synthesized voice. */}
+      <audio ref={audioPlayerRef} style={{ display: 'none' }} />
     </div>
   )
 }

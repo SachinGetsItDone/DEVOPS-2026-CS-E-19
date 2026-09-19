@@ -1,13 +1,16 @@
 import { createContext, useContext, useState, useCallback } from 'react'
+import { parseResume, createInterview, ApiError } from '../lib/api.js'
 
 /**
- * Holds the data collected on the Home page (resume + job description)
- * so the Interview Room can read it once the user starts a session.
+ * Holds the data collected on the Home page (resume + job description),
+ * talks to the backend to start a real interview, and makes the result
+ * available to the Interview Room.
  *
- * This is intentionally simple (React state + sessionStorage backup) so it
- * has no backend dependency yet. Swap `startSession` / `clearSession` for
- * real API calls once the ML teammate's endpoint is ready — the rest of
- * the app only depends on this context, not on how the data got here.
+ * `startSession` now does real work: it uploads the resume for parsing,
+ * then creates the interview (JD analysis + opening question) via the
+ * FastAPI gateway. It's async and can fail (network down, backend not
+ * running, etc.) — callers should await it and check the return value
+ * rather than assuming it always succeeds.
  */
 
 const InterviewSessionContext = createContext(null)
@@ -19,19 +22,43 @@ export function InterviewSessionProvider({ children }) {
     const raw = sessionStorage.getItem(STORAGE_KEY)
     return raw ? JSON.parse(raw) : null
   })
+  const [isStarting, setIsStarting] = useState(false)
+  const [startError, setStartError] = useState('')
 
-  const startSession = useCallback(({ resumeFile, resumeText, jobDescription, role }) => {
-    const next = {
-      resumeName: resumeFile?.name ?? null,
-      resumeText: resumeText ?? '',
-      jobDescription,
-      role,
-      startedAt: new Date().toISOString(),
+  const startSession = useCallback(async ({ resumeFile, jobDescription, role }) => {
+    setIsStarting(true)
+    setStartError('')
+
+    try {
+      const resumeText = resumeFile ? await parseResume(resumeFile) : ''
+      const { interview_id, opening_question, role: resolvedRole } = await createInterview({
+        role,
+        jdText: jobDescription,
+        resumeText,
+      })
+
+      const next = {
+        interviewId: interview_id,
+        resumeName: resumeFile?.name ?? null,
+        resumeText,
+        jobDescription,
+        role: resolvedRole || role,
+        openingQuestion: opening_question || '',
+        startedAt: new Date().toISOString(),
+      }
+      setSession(next)
+      // Files can't be JSON-serialized; only metadata + extracted text persist.
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      return next
+    } catch (err) {
+      const message = err instanceof ApiError
+        ? err.message
+        : 'Something went wrong starting the interview. Please try again.'
+      setStartError(message)
+      return null
+    } finally {
+      setIsStarting(false)
     }
-    setSession(next)
-    // Files can't be JSON-serialized meaningfully; only metadata is persisted.
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-    return next
   }, [])
 
   const clearSession = useCallback(() => {
@@ -40,7 +67,9 @@ export function InterviewSessionProvider({ children }) {
   }, [])
 
   return (
-    <InterviewSessionContext.Provider value={{ session, startSession, clearSession }}>
+    <InterviewSessionContext.Provider
+      value={{ session, startSession, clearSession, isStarting, startError }}
+    >
       {children}
     </InterviewSessionContext.Provider>
   )

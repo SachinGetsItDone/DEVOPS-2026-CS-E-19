@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import './PreInterviewModal.css'
 
-export default function PreInterviewModal({ open, onClose, onSubmit }) {
+export default function PreInterviewModal({ open, onClose, onSubmit, isSubmitting, serverError }) {
   const [resumeFile, setResumeFile] = useState(null)
   const [jobDescription, setJobDescription] = useState('')
   const [role, setRole] = useState('')
   const [error, setError] = useState('')
 
   if (!open) return null
+
+  // Local validation errors take priority; once those pass, a failure
+  // from the backend (network down, parse error, etc.) shows instead.
+  const displayError = error || serverError
 
   function handleFileChange(e) {
     const file = e.target.files?.[0]
@@ -24,8 +28,10 @@ export default function PreInterviewModal({ open, onClose, onSubmit }) {
 
   function handleSubmit(e) {
     e.preventDefault()
+    if (isSubmitting) return
     if (!resumeFile) return setError('Add your resume to continue.')
     if (!jobDescription.trim()) return setError('Paste the job description to continue.')
+    setError('')
     onSubmit({ resumeFile, jobDescription, role })
   }
 
@@ -78,14 +84,14 @@ export default function PreInterviewModal({ open, onClose, onSubmit }) {
             />
           </label>
 
-          {error && <p className="field__error">{error}</p>}
+          {displayError && <p className="field__error">{displayError}</p>}
 
           <div className="modal__actions">
-            <button type="button" className="modal__cancel" onClick={onClose}>
+            <button type="button" className="modal__cancel" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </button>
-            <button type="submit" className="modal__submit">
-              Enter interview room →
+            <button type="submit" className="modal__submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Setting up your interview…' : 'Enter interview room →'}
             </button>
           </div>
         </form>

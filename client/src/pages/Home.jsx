@@ -8,12 +8,16 @@ import './Home.css'
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false)
   const navigate = useNavigate()
-  const { startSession } = useInterviewSession()
+  const { startSession, isStarting, startError } = useInterviewSession()
 
-  function handleModalSubmit(data) {
-    startSession(data)
-    setModalOpen(false)
-    navigate('/interview')
+  async function handleModalSubmit(data) {
+    const started = await startSession(data)
+    // On failure startSession returns null and startError is set — the
+    // modal stays open and shows it instead of navigating away.
+    if (started) {
+      setModalOpen(false)
+      navigate('/interview')
+    }
   }
 
   return (
@@ -76,6 +80,8 @@ export default function Home() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleModalSubmit}
+        isSubmitting={isStarting}
+        serverError={startError}
       />
     </div>
   )
