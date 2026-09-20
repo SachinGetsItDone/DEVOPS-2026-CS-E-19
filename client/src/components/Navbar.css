@@ -47,3 +47,23 @@
 }
 
 .navbar__login:hover { border-color: var(--accent); }
+
+.navbar__stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.navbar__xp {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--accent);
+}
+
+.navbar__streak {
+  color: var(--text-muted);
+}

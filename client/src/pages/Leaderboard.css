@@ -1,0 +1,80 @@
+.leaderboard-page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.leaderboard {
+  padding: 48px 32px 96px;
+  max-width: 640px;
+}
+
+.leaderboard h1 {
+  font-size: 34px;
+  margin: 8px 0 32px;
+}
+
+.leaderboard__empty {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+.leaderboard__empty--error {
+  color: var(--danger);
+  font-family: var(--font-mono);
+}
+
+.leaderboard__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.leaderboard__row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--surface);
+}
+
+.leaderboard__row--me {
+  background: var(--accent-dim);
+}
+
+.leaderboard__rank {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.leaderboard__name {
+  font-size: 14px;
+}
+
+.leaderboard__league {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.leaderboard__league--gold { color: #e8a33d; }
+.leaderboard__league--silver { color: #b8bcc4; }
+.leaderboard__league--platinum { color: var(--live); }
+
+.leaderboard__xp {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  min-width: 56px;
+  text-align: right;
+}

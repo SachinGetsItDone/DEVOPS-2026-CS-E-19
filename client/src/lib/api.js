@@ -91,3 +91,33 @@ export async function submitTurn({ interviewId, audioBlob, transcript, resumeCon
 }
 
 export { ApiError }
+
+/** Generate (or regenerate) the post-interview report. */
+export async function generateReport(interviewId) {
+  return request(`/api/interviews/${interviewId}/report`, { method: 'POST' })
+}
+
+/** Fetch a previously generated report. */
+export async function getReport(interviewId) {
+  return request(`/api/interviews/${interviewId}/report`, { method: 'GET' })
+}
+
+/** Fetch a user's XP/streak/league state. */
+export async function getUserProgress(userId) {
+  return request(`/api/user/progress?user_id=${encodeURIComponent(userId)}`, { method: 'GET' })
+}
+
+/** Push the local gamification state to the backend. */
+export async function upsertUserProgress(state) {
+  return request('/api/user/progress', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(state),
+  })
+}
+
+/** Weekly XP leaderboard. */
+export async function getLeaderboard(limit = 20) {
+  return request(`/api/leaderboard?limit=${limit}`, { method: 'GET' })
+}
+

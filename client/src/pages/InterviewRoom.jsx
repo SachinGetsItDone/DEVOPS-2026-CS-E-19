@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterviewSession } from '../context/InterviewSessionContext.jsx'
-import { submitTurn, ApiError } from '../lib/api.js'
+import { useGame } from '../context/GameContext.jsx'
+import { submitTurn, generateReport, ApiError } from '../lib/api.js'
 import './InterviewRoom.css'
 
 export default function InterviewRoom() {
   const { session, clearSession } = useInterviewSession()
+  const { recordCompletedInterview } = useGame()
   const navigate = useNavigate()
 
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isEnding, setIsEnding] = useState(false)
   const [turnError, setTurnError] = useState('')
   const [transcript, setTranscript] = useState([])
 
@@ -43,13 +46,35 @@ export default function InterviewRoom() {
 
   if (!session) return null
 
-  function handleEndInterview() {
+  async function handleEndInterview() {
+    if (isEnding) return
     // Stop any in-flight recording so the mic is released cleanly.
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop()
     }
-    clearSession()
-    navigate('/')
+
+    // Only a real, scored interview is worth a report — if nothing was
+    // ever answered, there's nothing for the backend to grade.
+    const hasAnsweredATurn = transcript.some((line) => line.speaker === 'user')
+    if (!hasAnsweredATurn || !session.interviewId) {
+      clearSession()
+      navigate('/')
+      return
+    }
+
+    setIsEnding(true)
+    try {
+      const report = await generateReport(session.interviewId)
+      recordCompletedInterview(report?.overall_score)
+      const interviewId = session.interviewId
+      clearSession()
+      navigate(`/report/${interviewId}`, { state: { report } })
+    } catch (err) {
+      // Report generation failing shouldn't trap the candidate in the
+      // room — fall back to just ending the session.
+      clearSession()
+      navigate('/')
+    }
   }
 
   function playInterviewerAudio(base64Audio) {
@@ -133,7 +158,9 @@ export default function InterviewRoom() {
           <span className="eyebrow">{session.role || 'General role'}</span>
           <span className="room__resume-chip">{session.resumeName}</span>
         </div>
-        <button className="room__end" onClick={handleEndInterview}>End interview</button>
+        <button className="room__end" onClick={handleEndInterview} disabled={isEnding}>
+          {isEnding ? 'Scoring…' : 'End interview'}
+        </button>
       </header>
 
       <div className="room__body">
