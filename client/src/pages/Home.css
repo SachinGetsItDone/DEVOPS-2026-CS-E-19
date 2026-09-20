@@ -1,8 +1,56 @@
+/* ---------- Hero frame: bordered container with an animated glow,
+   inspired by dashboard-style product heroes — corner mono labels,
+   a soft rotating aurora behind the headline. Kept in the site's own
+   amber/teal palette rather than introducing new brand colors. ---------- */
+
+.hero-frame {
+  position: relative;
+  margin-top: 28px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% -10%, var(--surface) 0%, var(--bg) 70%);
+}
+
+.hero-frame__glow {
+  position: absolute;
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 720px;
+  height: 720px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--accent-dim), transparent 30%, var(--live) 55%, transparent 75%, var(--accent-dim));
+  filter: blur(90px);
+  opacity: 0.35;
+  animation: rotate-glow 22s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotate-glow {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+
+.hero-frame__corner {
+  position: absolute;
+  top: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  z-index: 1;
+}
+
+.hero-frame__corner--tl { left: 28px; }
+.hero-frame__corner--tr { right: 28px; }
+
 .hero {
-  padding: 96px 32px 64px;
+  position: relative;
+  z-index: 1;
+  padding: 88px 32px 64px;
   max-width: 760px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .hero__title {
@@ -44,11 +92,10 @@
   color: var(--text);
   display: inline-flex;
   align-items: center;
+  background: var(--surface);
 }
 .btn--ghost:hover { border-color: var(--accent); }
 
-/* Signature element: an idle waveform, echoing the transcript panel
-   in the interview room — this page is where that room begins. */
 .hero__waveform {
   display: flex;
   align-items: flex-end;
@@ -71,45 +118,152 @@
   50% { height: 85%; }
 }
 
-.modes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 40px 32px 80px;
+/* ---------- Shared section heading style ---------- */
+
+.section__title {
+  font-size: 30px;
+  max-width: 520px;
+  margin: 10px 0 40px;
+  line-height: 1.2;
 }
 
-.mode-card {
+/* ---------- How it works: 3-step strip ---------- */
+
+.steps {
+  padding: 88px 32px 24px;
+}
+
+.steps__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.step {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.step__num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.step h3 { font-size: 19px; margin: 10px 0 8px; }
+.step p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+/* ---------- Features grid ---------- */
+
+.features {
+  padding: 64px 32px 24px;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.feature-card:hover { border-color: var(--accent-dim); }
+
+.feature-card--muted { opacity: 0.55; }
+
+.feature-card__tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--live);
+  width: fit-content;
+}
+
+.feature-card--muted .feature-card__tag { color: var(--text-muted); }
+
+.feature-card h3 { font-size: 17px; margin-top: 2px; }
+.feature-card p { color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+
+/* ---------- Report teaser ---------- */
+
+.report-teaser {
+  padding: 88px 32px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 48px;
+  align-items: center;
+}
+
+.report-teaser__copy p {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 440px;
+}
+
+.report-teaser__card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  gap: 20px;
 }
 
-.mode-card h3 { font-size: 22px; margin-top: 4px; }
-.mode-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
-
-.mode-card--muted { opacity: 0.6; }
-
-.mode-card__cta {
-  margin-top: 8px;
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 14px;
+.report-teaser__ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  background: var(--accent-dim);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 24px;
   font-weight: 600;
-  padding: 0;
-  text-align: left;
-  width: fit-content;
+  color: var(--accent);
 }
 
-.mode-card__cta--disabled {
+.report-teaser__ring span {
+  font-family: var(--font-mono);
+  font-size: 11px;
   color: var(--text-muted);
-  cursor: default;
 }
+
+.report-teaser__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tbar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.tbar span {
+  display: block;
+  height: 100%;
+  background: var(--live);
+  border-radius: 999px;
+}
+
+/* ---------- Footer ---------- */
 
 .footer {
   padding: 24px 32px 40px;
@@ -118,8 +272,16 @@
   font-size: 13px;
 }
 
+@media (max-width: 900px) {
+  .steps__grid { grid-template-columns: 1fr; gap: 32px; }
+  .features__grid { grid-template-columns: 1fr 1fr; }
+  .report-teaser { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
   .hero__title { font-size: 36px; }
-  .modes { grid-template-columns: 1fr; padding: 24px 20px 60px; }
   .hero { padding: 64px 20px 48px; }
+  .hero-frame__glow { width: 480px; height: 480px; top: -160px; }
+  .features__grid { grid-template-columns: 1fr; }
+  .steps, .features, .report-teaser { padding-left: 20px; padding-right: 20px; }
 }
