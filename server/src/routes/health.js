@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+
 const { asyncHandler } = require('../middleware/errors');
 
 const router = express.Router();
@@ -15,5 +16,13 @@ router.get(
     });
   })
 );
+
+// API version endpoint
+router.get('/version', (req, res) => {
+  res.json({
+    version: '3.0.0',
+    name: 'Mock Interview Engine API',
+  });
+});
 
 module.exports = router;
