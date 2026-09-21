@@ -26,6 +26,9 @@ client/.vite/
 data/
 graphify-out/
 
+# Local-only audit notes (never commit)
+ISSUES_AUDIT.md
+
 # OS
 .DS_Store
 Thumbs.db
