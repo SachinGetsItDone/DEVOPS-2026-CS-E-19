@@ -16,3 +16,9 @@ def test_interview_turn_without_input():
     data = response.json()
 
     assert "error" in data
+
+
+def test_invalid_api_route():
+    response = client.get("/api/invalid-route")
+
+    assert response.status_code == 404
