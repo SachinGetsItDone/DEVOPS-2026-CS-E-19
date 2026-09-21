@@ -6,11 +6,11 @@ import { parseResume, createInterview, ApiError } from '../lib/api.js'
  * talks to the backend to start a real interview, and makes the result
  * available to the Interview Room.
  *
- * `startSession` now does real work: it uploads the resume for parsing,
- * then creates the interview (JD analysis + opening question) via the
- * FastAPI gateway. It's async and can fail (network down, backend not
- * running, etc.) — callers should await it and check the return value
- * rather than assuming it always succeeds.
+ * `startSession` does real work: it uploads the resume for parsing, then
+ * creates the interview (JD-aware first question) via the Node backend.
+ * That backend requires a logged-in user (JWT) for interview creation —
+ * if nobody's logged in, this will fail with the backend's own
+ * "Authentication required." message rather than silently proceeding.
  */
 
 const InterviewSessionContext = createContext(null)
@@ -31,7 +31,7 @@ export function InterviewSessionProvider({ children }) {
 
     try {
       const resumeText = resumeFile ? await parseResume(resumeFile) : ''
-      const { interview_id, opening_question, role: resolvedRole } = await createInterview({
+      const { interview_id, first_question, role: resolvedRole } = await createInterview({
         role,
         jdText: jobDescription,
         resumeText,
@@ -43,7 +43,7 @@ export function InterviewSessionProvider({ children }) {
         resumeText,
         jobDescription,
         role: resolvedRole || role,
-        openingQuestion: opening_question || '',
+        openingQuestion: first_question || '',
         startedAt: new Date().toISOString(),
       }
       setSession(next)

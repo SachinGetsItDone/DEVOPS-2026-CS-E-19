@@ -9,7 +9,7 @@ export default function Report() {
   const { interviewId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const { xp } = useGame()
+  const { xp, refresh: refreshProgress } = useGame()
 
   const [report, setReport] = useState(location.state?.report ?? null)
   const [status, setStatus] = useState(location.state?.report ? 'ready' : 'loading')
@@ -23,24 +23,33 @@ export default function Report() {
       try {
         const existing = await getReport(interviewId)
         if (cancelled) return
-        if (existing?.overall_score !== undefined) {
-          setReport(existing)
-          setStatus('ready')
-          return
-        }
-        // Not generated yet (e.g. direct link / page refresh) — generate now.
-        const generated = await generateReport(interviewId)
-        if (cancelled) return
-        setReport(generated)
+        setReport(existing)
         setStatus('ready')
       } catch (err) {
         if (cancelled) return
+        if (err instanceof ApiError && err.status === 404) {
+          // Not generated yet (e.g. direct link / page refresh) — generate now.
+          try {
+            const generated = await generateReport(interviewId)
+            if (cancelled) return
+            setReport(generated)
+            setStatus('ready')
+            refreshProgress()
+            return
+          } catch (genErr) {
+            if (cancelled) return
+            setError(genErr instanceof ApiError ? genErr.message : 'Could not generate this report.')
+            setStatus('error')
+            return
+          }
+        }
         setError(err instanceof ApiError ? err.message : 'Could not load this report.')
         setStatus('error')
       }
     }
     load()
     return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interviewId, report])
 
   return (
@@ -72,31 +81,13 @@ export default function Report() {
                 <span className="score-ring__value">{report.overall_score}</span>
                 <span className="score-ring__max">/10</span>
               </div>
-              <p className="report__summary">{report.summary}</p>
-            </div>
-
-            {report.competencies?.length > 0 && (
-              <div className="report__section">
-                <h2>Competencies</h2>
-                <div className="competency-list">
-                  {report.competencies.map((c, i) => (
-                    <div className="competency" key={i}>
-                      <div className="competency__row">
-                        <span className="competency__name">{c.name}</span>
-                        <span className="competency__score">{c.score}/10</span>
-                      </div>
-                      <div className="competency__bar">
-                        <div
-                          className="competency__bar-fill"
-                          style={{ width: `${Math.max(0, Math.min(100, (c.score / 10) * 100))}%` }}
-                        />
-                      </div>
-                      {c.comment && <p className="competency__comment">{c.comment}</p>}
-                    </div>
-                  ))}
-                </div>
+              <div>
+                <p className="report__summary">{report.summary}</p>
+                {report.xp_earned > 0 && (
+                  <p className="report__xp-earned">+{report.xp_earned} XP earned this interview</p>
+                )}
               </div>
-            )}
+            </div>
 
             <div className="report__columns">
               {report.strengths?.length > 0 && (
@@ -107,15 +98,31 @@ export default function Report() {
                   </ul>
                 </div>
               )}
-              {report.gaps?.length > 0 && (
+              {report.weaknesses?.length > 0 && (
                 <div className="report__section">
                   <h2>Areas to work on</h2>
                   <ul className="report__list report__list--gap">
-                    {report.gaps.map((g, i) => <li key={i}>{g}</li>)}
+                    {report.weaknesses.map((w, i) => <li key={i}>{w}</li>)}
                   </ul>
                 </div>
               )}
             </div>
+
+            {report.roadmap?.length > 0 && (
+              <div className="report__section">
+                <h2>Suggested next steps</h2>
+                <ol className="report__list report__list--roadmap">
+                  {report.roadmap.map((r, i) => <li key={i}>{r}</li>)}
+                </ol>
+              </div>
+            )}
+
+            {report.engine && report.engine.includes('offline') && (
+              <p className="report__engine-note">
+                Scored with the offline fallback (no LLM key configured on the backend) — feedback is
+                heuristic, not model-generated.
+              </p>
+            )}
 
             <div className="report__actions">
               <span className="report__xp">You now have {xp} XP</span>

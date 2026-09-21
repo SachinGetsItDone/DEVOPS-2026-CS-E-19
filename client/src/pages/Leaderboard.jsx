@@ -1,23 +1,28 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
-import { useGame } from '../context/GameContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import { getLeaderboard, ApiError } from '../lib/api.js'
 import './Leaderboard.css'
 
-const LEAGUE_LABEL = { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum' }
+const LEAGUE_LABEL = { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum', diamond: 'Diamond' }
 
 export default function Leaderboard() {
-  const { userId } = useGame()
+  const { user } = useAuth()
   const [rows, setRows] = useState([])
   const [status, setStatus] = useState('loading')
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (!user) {
+      setStatus('needs-login')
+      return
+    }
     let cancelled = false
     getLeaderboard(20)
       .then((data) => {
         if (cancelled) return
-        setRows(data?.rows ?? [])
+        setRows(Array.isArray(data) ? data : [])
         setStatus('ready')
       })
       .catch((err) => {
@@ -26,34 +31,39 @@ export default function Leaderboard() {
         setStatus('error')
       })
     return () => { cancelled = true }
-  }, [])
+  }, [user])
 
   return (
     <div className="leaderboard-page">
       <Navbar />
       <div className="container leaderboard">
-        <span className="eyebrow">This week</span>
+        <span className="eyebrow">By total XP</span>
         <h1>Leaderboard</h1>
 
+        {status === 'needs-login' && (
+          <p className="leaderboard__empty">
+            <Link to="/login">Log in</Link> to see the leaderboard and where you rank.
+          </p>
+        )}
         {status === 'loading' && <p className="leaderboard__empty">Loading…</p>}
         {status === 'error' && <p className="leaderboard__empty leaderboard__empty--error">{error}</p>}
         {status === 'ready' && rows.length === 0 && (
-          <p className="leaderboard__empty">No one's completed a practice interview yet this week — be the first.</p>
+          <p className="leaderboard__empty">No one's completed a practice interview yet — be the first.</p>
         )}
 
         {status === 'ready' && rows.length > 0 && (
           <div className="leaderboard__list">
-            {rows.map((row) => (
+            {rows.map((row, i) => (
               <div
-                key={row.rank}
-                className={`leaderboard__row ${row.user_id === userId ? 'leaderboard__row--me' : ''}`}
+                key={row.user_id}
+                className={`leaderboard__row ${row.user_id === user?.id ? 'leaderboard__row--me' : ''}`}
               >
-                <span className="leaderboard__rank">#{row.rank}</span>
+                <span className="leaderboard__rank">#{i + 1}</span>
                 <span className="leaderboard__name">{row.name}</span>
                 <span className={`leaderboard__league leaderboard__league--${row.league}`}>
                   {LEAGUE_LABEL[row.league] || row.league}
                 </span>
-                <span className="leaderboard__xp">{row.weekly_xp} XP</span>
+                <span className="leaderboard__xp">{row.xp} XP</span>
               </div>
             ))}
           </div>

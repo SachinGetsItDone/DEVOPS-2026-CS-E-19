@@ -7,7 +7,7 @@ import './InterviewRoom.css'
 
 export default function InterviewRoom() {
   const { session, clearSession } = useInterviewSession()
-  const { recordCompletedInterview } = useGame()
+  const { refresh: refreshProgress } = useGame()
   const navigate = useNavigate()
 
   const [isRecording, setIsRecording] = useState(false)
@@ -65,7 +65,7 @@ export default function InterviewRoom() {
     setIsEnding(true)
     try {
       const report = await generateReport(session.interviewId)
-      recordCompletedInterview(report?.overall_score)
+      await refreshProgress()
       const interviewId = session.interviewId
       clearSession()
       navigate(`/report/${interviewId}`, { state: { report } })
@@ -94,7 +94,6 @@ export default function InterviewRoom() {
         interviewId: session.interviewId,
         audioBlob,
         transcript: transcriptText,
-        resumeContext: session.resumeText,
       })
 
       setTranscript((prev) => [

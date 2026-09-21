@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import PreInterviewModal from '../components/PreInterviewModal.jsx'
 import { useInterviewSession } from '../context/InterviewSessionContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import './Home.css'
 
 const FEATURES = [
@@ -24,7 +25,7 @@ const FEATURES = [
   {
     tag: 'Core',
     title: 'Instant scored report',
-    body: 'A per-competency breakdown, concrete strengths, and named gaps — generated the moment you end the session.',
+    body: 'An overall score, concrete strengths, named weaknesses, and a roadmap for what to work on next — generated the moment you end the session.',
   },
   {
     tag: 'Core',
@@ -43,6 +44,15 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false)
   const navigate = useNavigate()
   const { startSession, isStarting, startError } = useInterviewSession()
+  const { user } = useAuth()
+
+  function handleTakeInterviewClick() {
+    if (!user) {
+      navigate('/login', { state: { from: '/' } })
+      return
+    }
+    setModalOpen(true)
+  }
 
   async function handleModalSubmit(data) {
     const started = await startSession(data)
@@ -72,7 +82,7 @@ export default function Home() {
             answered well, and where you didn't.
           </p>
           <div className="hero__actions">
-            <button className="btn btn--primary" onClick={() => setModalOpen(true)}>
+            <button className="btn btn--primary" onClick={handleTakeInterviewClick}>
               Take an AI interview
             </button>
             <a href="#how-it-works" className="btn btn--ghost">How it works</a>

@@ -1,14 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        // Use the virtual environment path inside the workspace
-        VENV_DIR = "venv"
-        PYTHON = "${WORKSPACE}\\${VENV_DIR}\\Scripts\\python.exe"
-        PIP = "${WORKSPACE}\\${VENV_DIR}\\Scripts\\pip.exe"
-        PYTEST = "${WORKSPACE}\\${VENV_DIR}\\Scripts\\pytest.exe"
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -16,36 +8,26 @@ pipeline {
             }
         }
 
-        stage('Backend: Setup Environment') {
-            steps {
-                bat """
-                if not exist "${VENV_DIR}" (
-                    python -m venv ${VENV_DIR}
-                )
-                """
-            }
-        }
-
         stage('Backend: Install Dependencies') {
+            // The backend was migrated from Python/FastAPI to Node/Express
+            // on 2026-09-21 (see server/package.json) - server/requirements.txt
+            // and server/tests/ (pytest) no longer exist, so this pipeline
+            // no longer needs a Python venv at all.
             steps {
-                // requirements.txt and tests/ live under server/, not repo root.
                 dir('server') {
-                    bat """
-                    ${PIP} install --upgrade pip
-                    ${PIP} install -r requirements.txt
-                    ${PIP} install pytest httpx
-                    """
+                    bat 'npm ci'
                 }
             }
         }
 
         stage('Backend: Run Tests') {
+            // There are no *.test.js files in server/ yet (only a jest setup
+            // file, tests/env.js) - --passWithNoTests keeps that honest
+            // instead of the build silently failing on "no tests found."
+            // Swap that flag out once real tests exist.
             steps {
                 dir('server') {
-                    bat """
-                    set PYTHONPATH=${WORKSPACE}\\server
-                    ${PYTEST} tests/ --junitxml=test-results.xml
-                    """
+                    bat 'npx jest --runInBand --passWithNoTests --reporters=default --reporters=jest-junit'
                 }
             }
         }
@@ -53,21 +35,21 @@ pipeline {
         stage('Frontend: Install Dependencies') {
             steps {
                 dir('client') {
-                    bat "npm ci"
+                    bat 'npm ci'
                 }
             }
         }
 
         stage('Frontend: Build Check') {
             // No test framework (vitest/jest) is wired up in client/ yet, and
-            // there's no `test` script in package.json — this stage is a
+            // there's no `test` script in package.json - this stage is a
             // build/smoke check, not real test coverage. It still catches
             // real regressions: a broken import or syntax error fails the
             // build the same way it would fail `npm run dev` for a teammate.
             // Swap this for `npm test` once component tests exist.
             steps {
                 dir('client') {
-                    bat "npm run build"
+                    bat 'npm run build'
                 }
             }
         }
@@ -75,8 +57,8 @@ pipeline {
 
     post {
         always {
-            junit allowEmptyResults: true, testResults: 'server/test-results.xml'
-            archiveArtifacts artifacts: 'server/test-results.xml', allowEmptyArchive: true
+            junit allowEmptyResults: true, testResults: 'server/junit.xml'
+            archiveArtifacts artifacts: 'server/junit.xml', allowEmptyArchive: true
         }
         success {
             echo "Pipeline completed successfully!"

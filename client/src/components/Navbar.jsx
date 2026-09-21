@@ -1,9 +1,17 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
 import { useGame } from '../context/GameContext.jsx'
 import './Navbar.css'
 
 export default function Navbar() {
+  const { user, logout } = useAuth()
   const { xp, streak, loaded } = useGame()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate('/')
+  }
 
   return (
     <header className="navbar">
@@ -15,13 +23,17 @@ export default function Navbar() {
         <nav className="navbar__links">
           <a href="#how-it-works">How it works</a>
           <Link to="/leaderboard">Leaderboard</Link>
-          {loaded && (
+          {user && loaded && (
             <span className="navbar__stats" title={`${streak}-day streak`}>
               <span className="navbar__xp">{xp} XP</span>
               {streak > 0 && <span className="navbar__streak">🔥 {streak}</span>}
             </span>
           )}
-          <button className="navbar__login">Log in</button>
+          {user ? (
+            <button className="navbar__login" onClick={handleLogout}>Log out</button>
+          ) : (
+            <Link to="/login" className="navbar__login">Log in</Link>
+          )}
         </nav>
       </div>
     </header>
