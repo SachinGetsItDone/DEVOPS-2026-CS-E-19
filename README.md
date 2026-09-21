@@ -102,3 +102,4 @@ project-/
 - This merge keeps both the frontend workflow from the `riya` branch and the more complete backend architecture from `main`.
 - The full AI pipeline should be treated as a later integration step, while the current UI remains usable as a front-end prototype.
 - MongoDB and Postgres must be configured for the backend features to run end-to-end.
+
