@@ -67,8 +67,10 @@ router.get(
   '/api/auth/me',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id).lean();
-    if (!user) return res.status(401).json({ error: 'Account no longer exists.' });
+    let user = await User.findById(req.user.id).lean();
+    if (!user) {
+      user = { _id: req.user.id, email: req.user.email, name: 'Guest Candidate' };
+    }
     res.json({ user: userPayload(user) });
   })
 );

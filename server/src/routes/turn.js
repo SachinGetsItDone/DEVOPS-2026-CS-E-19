@@ -17,26 +17,50 @@ const upload = multer({
 
 const turnLimiter = rateLimit({ max: 60, windowMs: 60_000, key: 'turn' });
 
-// Attempt transcription through NVIDIA when a key is configured; returns
-// null when unavailable so the caller can answer honestly with a 400.
+// Attempt transcription through Groq Whisper or NVIDIA when keys are configured;
+// returns null when unavailable so the caller can answer honestly with a 400.
 async function transcribeAudio(file) {
-  if (!config.NVIDIA_API_KEY) return null;
-  try {
-    const form = new FormData();
-    form.append('file', new Blob([file.buffer], { type: file.mimetype || 'audio/wav' }), file.originalname || 'audio.wav');
-    form.append('model', config.NVIDIA_TTS_MODEL);
-    const res = await fetch(`${config.NVIDIA_TTS_URL}/audio/transcriptions`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${config.NVIDIA_API_KEY}` },
-      body: form,
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return typeof data.text === 'string' ? data.text : null;
-  } catch {
-    return null;
+  if (config.GROQ_API_KEY) {
+    try {
+      const form = new FormData();
+      form.append('file', new Blob([file.buffer], { type: file.mimetype || 'audio/wav' }), file.originalname || 'answer.wav');
+      form.append('model', 'whisper-large-v3');
+      form.append('prompt', 'Technical software engineering mock interview response.');
+      const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${config.GROQ_API_KEY}` },
+        body: form,
+        signal: AbortSignal.timeout(25_000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.text === 'string' && data.text.trim()) return data.text.trim();
+      }
+    } catch (err) {
+      console.warn(`[stt] Groq transcription error: ${err.message}`);
+    }
   }
+
+  if (config.NVIDIA_API_KEY) {
+    try {
+      const form = new FormData();
+      form.append('file', new Blob([file.buffer], { type: file.mimetype || 'audio/wav' }), file.originalname || 'audio.wav');
+      form.append('model', config.NVIDIA_TTS_MODEL);
+      const res = await fetch(`${config.NVIDIA_TTS_URL}/audio/transcriptions`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${config.NVIDIA_API_KEY}` },
+        body: form,
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data.text === 'string' ? data.text : null;
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 router.post(

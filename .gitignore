@@ -26,8 +26,16 @@ client/.vite/
 data/
 graphify-out/
 
-# Local-only audit notes (never commit)
+# Local-only audit notes and AI scratch files (never commit)
 ISSUES_AUDIT.md
+ANTIGRAVITY_SITE_ANALYSIS.md
+scratch*.js
+*.tmp
+*.log
+.gemini/
+.agents/
+.vscode/
+.idea/
 
 # OS
 .DS_Store

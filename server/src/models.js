@@ -75,6 +75,70 @@ const ReportSchema = new Schema(
     roadmap: { type: [String], default: [] },
     xp_earned: { type: Number, default: 0 },
     engine: { type: String, default: 'offline-heuristic' },
+    behavioral_metrics: {
+      filler_words: {
+        total_count: { type: Number, default: 0 },
+        frequency_per_100_words: { type: Number, default: 0 },
+        breakdown: [{ word: String, count: Number }],
+      },
+      repeated_words: [{ word: String, count: Number }],
+      grammar_issues: [
+        {
+          issue: { type: String, default: '' },
+          example: { type: String, default: '' },
+          suggestion: { type: String, default: '' },
+        },
+      ],
+      delivery_and_pacing: {
+        pace_assessment: { type: String, default: 'Balanced' },
+        avg_words_per_turn: { type: Number, default: 0 },
+        conciseness_score: { type: Number, default: 8 },
+        notes: { type: String, default: '' },
+      },
+      real_interview_tips: { type: [String], default: [] },
+    },
+    comparison: {
+      has_previous: { type: Boolean, default: false },
+      previous_score: { type: Number, default: null },
+      score_delta: { type: Number, default: 0 },
+      filler_delta: { type: Number, default: 0 },
+      improvements: { type: [String], default: [] },
+      persistent_issues: { type: [String], default: [] },
+      message: { type: String, default: '' },
+    },
+  },
+  { timestamps: true }
+);
+
+const AtsScanSchema = new Schema(
+  {
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    ats_score: { type: Number, required: true },
+    component_scores: {
+      formatting: { type: Number, default: 0 },
+      keywords: { type: Number, default: 0 },
+      content: { type: Number, default: 0 },
+      skill_validation: { type: Number, default: 0 },
+      ats_compatibility: { type: Number, default: 0 },
+    },
+    matched_keywords: { type: [String], default: [] },
+    missing_keywords: { type: [String], default: [] },
+    language_analysis: {
+      weak_verbs: { type: [String], default: [] },
+      repetitive_phrases: { type: [String], default: [] },
+      grammar_improvements: [
+        {
+          issue: { type: String, default: '' },
+          fix: { type: String, default: '' },
+        },
+      ],
+      bullet_structure_score: { type: Number, default: 8 },
+    },
+    strengths: { type: [String], default: [] },
+    critical_issues: { type: [String], default: [] },
+    suggestions: { type: [String], default: [] },
+    real_interview_alignment: { type: [String], default: [] },
+    score_delta: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
@@ -94,6 +158,7 @@ const Progress = mongoose.model('Progress', ProgressSchema);
 const Interview = mongoose.model('Interview', InterviewSchema);
 const Turn = mongoose.model('Turn', TurnSchema);
 const Report = mongoose.model('Report', ReportSchema);
+const AtsScan = mongoose.model('AtsScan', AtsScanSchema);
 const DomainKnowledge = mongoose.model('DomainKnowledge', DomainKnowledgeSchema);
 
-module.exports = { User, Progress, Interview, Turn, Report, DomainKnowledge };
+module.exports = { User, Progress, Interview, Turn, Report, AtsScan, DomainKnowledge };

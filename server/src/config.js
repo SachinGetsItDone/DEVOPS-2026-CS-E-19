@@ -49,9 +49,10 @@ const config = {
   MONGO_URI: str('MONGO_URI', 'mongodb://localhost:27017'),
   MONGO_DB: str('MONGO_DB', 'interview'),
 
-  DEEPSEEK_API_KEY: str('DEEPSEEK_API_KEY'),
-  DEEPSEEK_BASE_URL: str('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
-  DEEPSEEK_MODEL: str('DEEPSEEK_MODEL', 'deepseek-chat'),
+  GROQ_API_KEY: str('GROQ_API_KEY'),
+  DEEPSEEK_API_KEY: str('DEEPSEEK_API_KEY') || str('GROQ_API_KEY'),
+  DEEPSEEK_BASE_URL: str('DEEPSEEK_BASE_URL', str('GROQ_API_KEY') ? 'https://api.groq.com/openai/v1' : 'https://api.deepseek.com'),
+  DEEPSEEK_MODEL: str('DEEPSEEK_MODEL', str('GROQ_API_KEY') ? 'openai/gpt-oss-120b' : 'deepseek-chat'),
 
   NVIDIA_API_KEY: str('NVIDIA_API_KEY'),
   NVIDIA_TTS_URL: str('NVIDIA_STS_BASE_URL', 'https://integrate.api.nvidia.com/v1'),
@@ -62,9 +63,9 @@ const config = {
   RAG_MODE: str('RAG_MODE', 'auto'),
   EMBEDDING_MODEL: str('EMBEDDING_MODEL', 'Xenova/all-MiniLM-L6-v2'),
 
-  MAX_AUDIO_BYTES: int('MAX_AUDIO_BYTES', 20 * 1024 * 1024),
-  MAX_RESUME_BYTES: int('MAX_RESUME_BYTES', 5 * 1024 * 1024),
-  MAX_TEXT_CHARS: int('MAX_TEXT_CHARS', 20000),
+  MAX_AUDIO_BYTES: int('MAX_AUDIO_BYTES', 50 * 1024 * 1024),
+  MAX_RESUME_BYTES: int('MAX_RESUME_BYTES', 100 * 1024 * 1024),
+  MAX_TEXT_CHARS: int('MAX_TEXT_CHARS', 50000),
 };
 
 if (config.JWT_EPHEMERAL_SECRET && process.env.NODE_ENV === 'production') {

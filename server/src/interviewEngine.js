@@ -131,9 +131,13 @@ async function processTurn({ userId, interviewId, transcript }) {
   );
   const turnNumber = updated.current_turn;
 
+  const pastTurns = await Turn.find({ interview: interview._id })
+    .sort({ turn_number: 1 })
+    .lean();
+
   const prevTurn =
-    turnNumber > 1
-      ? await Turn.findOne({ interview: interview._id, turn_number: turnNumber - 1 }).lean()
+    pastTurns.length > 0
+      ? pastTurns[pastTurns.length - 1]
       : null;
   const question = prevTurn?.next_question || interview.started_question;
 
@@ -145,7 +149,10 @@ async function processTurn({ userId, interviewId, transcript }) {
     role: interview.role,
     question,
     turnNumber,
+    pastTurns,
   });
+
+  const responseText = evaluation.conversational_response || evaluation.next_question;
 
   await Turn.create({
     interview: interview._id,
@@ -164,11 +171,11 @@ async function processTurn({ userId, interviewId, transcript }) {
   await awardXp(userId, xp);
   await refreshLeague(userId);
 
-  const audio = await stsService.synthesizeText(evaluation.next_question);
+  const audio = await stsService.synthesizeText(responseText);
   return {
     user_transcript: transcript,
     evaluation,
-    response_text: evaluation.next_question,
+    response_text: responseText,
     turn_number: turnNumber,
     xp_earned: xp,
     sts_model: audio.model,
@@ -183,18 +190,35 @@ async function skipTurn({ userId, interviewId }) {
   const interview = await findOwnedInterview(interviewId, userId);
   if (!interview) return { notFound: true };
 
+  const pastTurns = await Turn.find({ interview: interview._id })
+    .sort({ turn_number: 1 })
+    .lean();
+  const asked = [
+    interview.started_question,
+    ...pastTurns.map((t) => t.question),
+    ...pastTurns.map((t) => t.next_question),
+  ].filter(Boolean);
+
   const out = await llmService.chatJson(
     'You are an expert technical interviewer. Reply only with JSON.',
     `The candidate skipped the last question for a ${interview.role} interview. ` +
-      'Return {"next_question": string} - a different angle on the same area.'
+      `Already asked: ${asked.map((q) => `"${q}"`).join(', ')}. ` +
+      'Return {"next_question": string, "conversational_response": string} - smoothly pivot to a different topic without repeating anything asked.'
   );
   const nextQuestion =
     out?.next_question && String(out.next_question).trim()
       ? String(out.next_question).trim()
-      : QUESTION_BANK[(interview.current_turn + 1) % QUESTION_BANK.length];
-  const audio = await stsService.synthesizeText(nextQuestion);
+      : QUESTION_BANK.find((q) => !asked.includes(q)) || QUESTION_BANK[(interview.current_turn + 1) % QUESTION_BANK.length];
+
+  const conversational =
+    out?.conversational_response && String(out.conversational_response).trim()
+      ? String(out.conversational_response).trim()
+      : `No problem at all, let's pivot to another area: ${nextQuestion}`;
+
+  const audio = await stsService.synthesizeText(conversational);
   return {
     next_question: nextQuestion,
+    response_text: conversational,
     engine: out ? llmService.engine : 'offline-heuristic',
     sts_model: audio.model,
     sts_audio_base64: audio.audio.toString('base64'),
@@ -212,7 +236,15 @@ async function generateReport({ userId, interviewId }) {
   const turns = await Turn.find({ interview: interview._id }).sort({ turn_number: 1 }).limit(200).lean();
   if (!turns.length) return { noTurns: true };
 
-  const rep = await llmService.synthesizeReport(turns);
+  // Fetch the candidate's most recent prior completed report for longitudinal comparison
+  const prevReport = await Report.findOne({
+    user: userId,
+    interview: { $ne: interview._id },
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const rep = await llmService.synthesizeReport(turns, prevReport);
   const report = await Report.create({
     interview: interview._id,
     user: userId,
@@ -221,6 +253,8 @@ async function generateReport({ userId, interviewId }) {
     strengths: rep.strengths,
     weaknesses: rep.weaknesses,
     roadmap: rep.roadmap,
+    behavioral_metrics: rep.behavioral_metrics,
+    comparison: rep.comparison,
     engine: rep.engine,
   });
 

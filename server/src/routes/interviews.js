@@ -75,6 +75,8 @@ router.post(
       strengths: result.report.strengths,
       weaknesses: result.report.weaknesses,
       roadmap: result.report.roadmap,
+      behavioral_metrics: result.report.behavioral_metrics,
+      comparison: result.report.comparison,
       xp_earned: result.report.xp_earned,
       engine: result.report.engine,
       cached: result.cached,
@@ -100,6 +102,8 @@ router.get(
       strengths: report.strengths,
       weaknesses: report.weaknesses,
       roadmap: report.roadmap,
+      behavioral_metrics: report.behavioral_metrics,
+      comparison: report.comparison,
       xp_earned: report.xp_earned,
       engine: report.engine,
     });
