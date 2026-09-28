@@ -58,6 +58,65 @@ async function findOwnedInterview(interviewId, userId) {
   return Interview.findOne({ _id: interviewId, user: userId });
 }
 
+// Paginated history of one user's interviews, newest first, with a per-interview
+// summary (answered turns, average answer score, and the report score if one has
+// been generated). Turn stats are computed from a small projection of just this
+// page's turns (page size is capped at 50) rather than a Mongo aggregation, so the
+// result is the same on any Mongo-compatible server.
+async function listInterviews({ userId, page = 1, limit = 20 }) {
+  const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 50);
+  const safePage = Math.max(parseInt(page, 10) || 1, 1);
+
+  const [total, interviews] = await Promise.all([
+    Interview.countDocuments({ user: userId }),
+    Interview.find({ user: userId })
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((safePage - 1) * safeLimit)
+      .limit(safeLimit)
+      .lean(),
+  ]);
+
+  const ids = interviews.map((i) => i._id);
+  const [turns, reports] = ids.length
+    ? await Promise.all([
+        Turn.find({ interview: { $in: ids } }).select('interview score').lean(),
+        Report.find({ interview: { $in: ids } }).select('interview overall_score').lean(),
+      ])
+    : [[], []];
+
+  const turnStats = new Map();
+  for (const t of turns) {
+    const key = String(t.interview);
+    const s = turnStats.get(key) || { count: 0, sum: 0 };
+    s.count += 1;
+    s.sum += t.score || 0;
+    turnStats.set(key, s);
+  }
+  const reportScores = new Map(reports.map((r) => [String(r.interview), r.overall_score]));
+
+  return {
+    total,
+    page: safePage,
+    limit: safeLimit,
+    has_more: safePage * safeLimit < total,
+    interviews: interviews.map((i) => {
+      const id = String(i._id);
+      const s = turnStats.get(id) || { count: 0, sum: 0 };
+      return {
+        interview_id: id,
+        role: i.role,
+        difficulty: i.difficulty,
+        status: i.status,
+        turns_answered: s.count,
+        avg_score: s.count ? Math.round((s.sum / s.count) * 10) / 10 : null,
+        has_report: reportScores.has(id),
+        overall_score: reportScores.has(id) ? reportScores.get(id) : null,
+        created_at: i.createdAt,
+      };
+    }),
+  };
+}
+
 async function processTurn({ userId, interviewId, transcript }) {
   const { llm: llmService, rag: ragService, sts: stsService } = services();
   const interview = await findOwnedInterview(interviewId, userId);
@@ -174,4 +233,4 @@ async function generateReport({ userId, interviewId }) {
   return { report, cached: false };
 }
 
-module.exports = { services, createInterview, processTurn, skipTurn, generateReport, findOwnedInterview };
+module.exports = { services, createInterview, processTurn, skipTurn, generateReport, findOwnedInterview, listInterviews };

@@ -3,7 +3,7 @@
 const express = require('express');
 const { asyncHandler } = require('../middleware/errors');
 const { requireAuth } = require('../middleware/auth');
-const { createInterview, findOwnedInterview, generateReport } = require('../interviewEngine');
+const { createInterview, findOwnedInterview, generateReport, listInterviews } = require('../interviewEngine');
 const { Turn, Report } = require('../models');
 
 const router = express.Router();
@@ -21,6 +21,14 @@ router.post(
       difficulty,
     });
     res.status(201).json(result);
+  })
+);
+
+router.get(
+  '/api/interviews',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    res.json(await listInterviews({ userId: req.user.id, page: req.query.page, limit: req.query.limit }));
   })
 );
 

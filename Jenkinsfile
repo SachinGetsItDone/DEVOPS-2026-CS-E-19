@@ -21,13 +21,15 @@ pipeline {
         }
 
         stage('Backend: Run Tests') {
-            // There are no *.test.js files in server/ yet (only a jest setup
-            // file, tests/env.js) - --passWithNoTests keeps that honest
-            // instead of the build silently failing on "no tests found."
-            // Swap that flag out once real tests exist.
+            // Runs server/tests/*.test.js (jest config lives in server/package.json).
+            // The integration tests start an in-memory MongoDB via
+            // mongodb-memory-server, which downloads a mongod binary on the first
+            // run - the agent needs internet access for that, once. Note the
+            // *.py files in server/tests/ are leftovers from the old Python
+            // backend; jest does not run them.
             steps {
                 dir('server') {
-                    bat 'npx jest --runInBand --passWithNoTests --reporters=default --reporters=jest-junit'
+                    bat 'npx jest --runInBand --reporters=default --reporters=jest-junit'
                 }
             }
         }
