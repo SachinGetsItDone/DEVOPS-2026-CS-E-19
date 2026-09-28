@@ -128,6 +128,11 @@ export async function submitTurn({ interviewId, audioBlob, transcript }) {
   return request('/api/interview/turn', { method: 'POST', body: formData })
 }
 
+/** The logged-in user's past interviews, newest first (paginated). */
+export async function getInterviews({ page = 1, limit = 20 } = {}) {
+  return request(`/api/interviews?page=${page}&limit=${limit}`, { method: 'GET' })
+}
+
 /** Generate (or fetch the cached) post-interview report. */
 export async function generateReport(interviewId) {
   return request(`/api/interviews/${interviewId}/report`, { method: 'POST' })

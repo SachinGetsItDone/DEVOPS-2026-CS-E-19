@@ -22,6 +22,7 @@ export default function Navbar() {
         </Link>
         <nav className="navbar__links">
           <a href="#how-it-works">How it works</a>
+          {user && <Link to="/history">History</Link>}
           <Link to="/leaderboard">Leaderboard</Link>
           {user && loaded && (
             <span className="navbar__stats" title={`${streak}-day streak`}>
