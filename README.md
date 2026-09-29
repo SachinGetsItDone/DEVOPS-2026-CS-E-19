@@ -52,7 +52,7 @@ The UI is designed to be wired to backend APIs later, while still working standa
 | Layer | Tech |
 |---|---|
 | Frontend | React 18 + Vite + react-router |
-| Backend | Python / FastAPI |
+| Backend | Node |
 | App data | MongoDB (Motor) |
 | RAG | Postgres + pgvector |
 | Reasoning | DeepSeek (`openai` SDK, JSON mode) |
