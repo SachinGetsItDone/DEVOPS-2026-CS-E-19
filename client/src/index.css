@@ -1,23 +1,105 @@
+/* ============================================================
+   Prepline — design tokens & base
+   World: a clean, luminous white studio. Pure white canvas,
+   graphite ink, warm accents. Inspired by three.js skinning-ik
+   example — expansive white with soft atmospheric fog.
+   ============================================================ */
+
 :root {
-  /* Color */
-  --bg: #0f1014;
-  --surface: #171922;
-  --surface-2: #1e212c;
-  --border: #2a2e3a;
-  --text: #ece9e2;
-  --text-muted: #9a9ea9;
-  --accent: #e8a33d;      /* spotlight amber — the interviewer's light */
-  --accent-dim: #6b5330;
-  --live: #4fd1c5;        /* teal — reserved for "recording / live" states only */
-  --danger: #e0665a;
+  /* --- ground: the room --- */
+  --bg: #ffffff;           /* pure white — the page floor */
+  --bg-deep: #f7f6f4;     /* wells: code, audio, insets */
+  --surface: #ffffff;
+  --surface-high: #f3f2ef;
+  --surface-raised: #eae9e6;
+  --border: #e2e0dc;
+  --border-strong: #c5c2bc;
 
-  /* Type */
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Inter', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* --- ink --- */
+  --text: #1a1a1a;         /* near-black for maximum readability */
+  --text-muted: #6b6966;   /* warm charcoal */
+  --text-faint: #9c9893;   /* disabled / hints */
 
-  --radius: 14px;
-  --radius-sm: 8px;
+  /* --- the signal: warm coral-orange — studious, warm, human --- */
+  --accent: #e8603c;       /* primary accent — warm terracotta/coral */
+  --accent-dark: #d14e2e;  /* pressed / hover-down */
+  --accent-hi: #f07858;    /* hover-up */
+  --accent-ghost: rgba(232, 96, 60, 0.06);
+  --accent-line: rgba(232, 96, 60, 0.22);
+  --accent-rgb: 232, 96, 60;
+
+  /* --- the microphone: reserved for live capture ONLY --- */
+  --live: #10b981;
+  --live-dark: #059669;
+  --live-ghost: rgba(16, 185, 129, 0.08);
+  --live-rgb: 16, 185, 129;
+
+  /* --- semantic --- */
+  --danger: #ef4444;
+  --danger-ghost: rgba(239, 68, 68, 0.07);
+  --danger-rgb: 239, 68, 68;
+  --success: var(--live);
+  --warning: #f59e0b;
+
+  /* --- legacy names: every pre-existing stylesheet still says "amber".
+         Repointing them here repaints all call sites with no file edits. --- */
+  --amber: var(--accent);
+  --amber-dark: var(--accent-dark);
+  --amber-bright: var(--accent-hi);
+  --amber-ghost: var(--accent-ghost);
+  --amber-line: var(--accent-line);
+
+  /* --- easing: exponential ease-out only, no linear, no bounce-as-default --- */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 340ms;
+
+  /* --- type --- */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Instrument Sans', -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* type scale — 1.25 ratio, display capped at 6rem per craft floor */
+  --t-display: clamp(2.75rem, 6vw, 5.25rem);
+  --t-h1: clamp(2rem, 4vw, 3.25rem);
+  --t-h2: clamp(1.5rem, 2.6vw, 2.125rem);
+  --t-h3: 1.3125rem;
+  --t-h4: 1.0625rem;
+  --t-body-lg: 1.0625rem;
+  --t-body: 0.9375rem;
+  --t-sm: 0.8125rem;
+  --t-xs: 0.75rem;
+
+  /* --- space: 4px base --- */
+  --s1: 0.25rem;  --s2: 0.5rem;   --s3: 0.75rem;  --s4: 1rem;
+  --s5: 1.25rem;  --s6: 1.5rem;   --s7: 2rem;     --s8: 2.5rem;
+  --s9: 3rem;     --s10: 4rem;    --s11: 6rem;    --s12: 8rem;
+
+  /* --- radius: modest, not rounded-lg-everywhere --- */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-pill: 999px;
+
+  /* --- back-compat aliases for the pre-existing page stylesheets --- */
+  --radius: var(--r-md);
+  --radius-sm: var(--r-sm);
+  --surface-2: var(--surface-high);
+  --accent-dim: var(--accent-ghost);
+
+  /* --- page layout --- */
+  --page-max: 1120px;
+  --page-gutter: 2rem;
+
+  /* --- depth: warm, subtle shadows for light theme --- */
+  --lift-1: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --lift-2: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --lift-3: 0 10px 20px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.04);
 }
 
 * { box-sizing: border-box; }
@@ -32,47 +114,306 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3 {
+/* --- headings: balanced, tracking floor respected, space above > below --- */
+h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 600;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  font-variation-settings: 'SOFT' 0, 'WONK' 0;
 }
+h1 { font-size: var(--t-h1); line-height: 1.08; letter-spacing: -0.03em; }
+h2 { font-size: var(--t-h2); line-height: 1.18; }
+h3 { font-size: var(--t-h3); line-height: 1.3; letter-spacing: -0.015em; }
+h4 { font-size: var(--t-h4); line-height: 1.4; letter-spacing: -0.01em;
+     font-family: var(--font-body); font-weight: 600; }
 
-p { margin: 0; }
+p { margin: 0; max-width: 68ch; }
 
 a { color: inherit; text-decoration: none; }
 
-button {
-  font-family: var(--font-body);
-  cursor: pointer;
-}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
 
+/* --- focus: themed, visible, never removed --- */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* ============================================================
+   Browser surfaces — the parts we did not draw.
+   ============================================================ */
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
 }
 
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+html { caret-color: var(--accent); }
+
+/* Firefox */
+html { scrollbar-color: var(--border-strong) transparent; scrollbar-width: thin; }
+
+/* WebKit / Blink */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--r-pill);
+  border: 3px solid var(--bg);
 }
+::-webkit-scrollbar-thumb:hover { background: #a8a49e; }
+::-webkit-scrollbar-corner { background: var(--bg); }
+
+/* --- data: numerals align in columns --- */
+.tabular, .metric, [data-numeric] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* --- code / measurement only. Mono is not a costume. --- */
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
 
 .container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 32px;
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
 }
+
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1 1 auto; min-width: 0; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- skip link: keyboard users land here first --- */
+.skip-link {
+  position: absolute;
+  top: var(--s2);
+  left: var(--s2);
+  z-index: 200;
+  padding: var(--s3) var(--s5);
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  transform: translateY(-160%);
+  transition: transform var(--dur) var(--ease-out-expo);
+}
+.skip-link:focus { transform: translateY(0); }
+
+/* ============================================================
+   Buttons — one family, explicit states
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  min-height: 44px;
+  padding: 0 var(--s5);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur) var(--ease-out-expo),
+    border-color var(--dur) var(--ease-out-expo),
+    color var(--dur) var(--ease-out-expo),
+    transform var(--dur-fast) var(--ease-out-expo);
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+.btn--primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+.btn--primary:hover:not(:disabled) { background: var(--accent-hi); }
+
+.btn--secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--accent-line);
+  background: var(--accent-ghost);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+.btn--ghost:hover:not(:disabled) { color: var(--text); background: var(--surface-high); }
+
+.btn--danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn--danger:hover:not(:disabled) { background: var(--danger-ghost); }
+
+.btn:disabled {
+  background: var(--surface-high);
+  color: var(--text-faint);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+}
+.btn[aria-busy='true'] { cursor: progress; }
+
+.btn--sm { min-height: 36px; padding: 0 var(--s4); font-size: var(--t-sm); }
+
+/* ============================================================
+   Fields
+   ============================================================ */
+
+.field { display: flex; flex-direction: column; gap: var(--s2); }
+.field > label {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--s4);
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-size: var(--t-body);
+  transition: border-color var(--dur) var(--ease-out-expo);
+}
+.field textarea { min-height: 120px; padding: var(--s3) var(--s4); line-height: 1.6; resize: vertical; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text-faint); }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: #a8a49e; }
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.field__hint { font-size: var(--t-sm); color: var(--text-muted); }
+.field--error input,
+.field--error textarea { border-color: var(--danger); }
+.field--error .field__hint { color: var(--danger); }
+
+/* ============================================================
+   Pills & meters
+   ============================================================ */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  height: 24px;
+  padding: 0 var(--s3);
+  border: 1px solid;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pill--live { color: var(--live); border-color: var(--live); background: var(--live-ghost); }
+.pill--ok { color: var(--accent); border-color: var(--accent-line); background: var(--accent-ghost); }
+.pill--warn { color: var(--warning); border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.07); }
+.pill--bad { color: var(--danger); border-color: rgba(239, 68, 68, 0.35); background: var(--danger-ghost); }
+.pill--muted { color: var(--text-muted); border-color: var(--border-strong); }
+
+.meter {
+  height: 6px;
+  background: var(--surface-high);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.meter > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  transition: width var(--dur-slow) var(--ease-out-expo);
+}
+
+/* ============================================================
+   Surfaces
+   ============================================================ */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s6);
+}
+.panel--raised { background: var(--surface); box-shadow: var(--lift-2); }
+
+/* ============================================================
+   Eyebrow — section label
+   ============================================================ */
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+/* ============================================================
+   Reduced motion — kills every loop, not just CSS transitions.
+   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+@media (max-width: 640px) {
+  :root { --page-gutter: 1.25rem; }
+}
+
+@media (max-width: 400px) {
+  :root { --page-gutter: 1rem; }
 }

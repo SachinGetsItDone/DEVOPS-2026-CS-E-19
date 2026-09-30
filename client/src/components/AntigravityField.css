@@ -1,0 +1,25 @@
+/* AntigravityField — sits behind all hero content, never intercepts clicks. */
+.antigravity-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+}
+
+/* Foreground hero layers must paint above the canvas. */
+.hero-frame .hero__grid,
+.hero-frame__corner {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .antigravity-field {
+    /* Static frame is drawn once in JS; no CSS animation to disable. */
+    opacity: 1;
+  }
+}

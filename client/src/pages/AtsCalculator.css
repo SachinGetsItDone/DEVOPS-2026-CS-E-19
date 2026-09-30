@@ -1,0 +1,456 @@
+.ats-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.ats-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  width: 100%;
+}
+
+.ats-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.ats-header h1 {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: -0.02em;
+  margin: 8px 0 12px;
+}
+
+.ats-header p {
+  color: var(--text-muted);
+  font-size: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ats-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.ats-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .ats-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ats-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ats-field label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.ats-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--surface-2);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.ats-dropzone:hover, .ats-dropzone.has-file {
+  border-color: var(--accent);
+  background: rgba(234, 179, 8, 0.05);
+}
+
+.ats-dropzone-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.ats-dropzone-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-all;
+}
+
+.ats-dropzone-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.ats-textarea {
+  width: 100%;
+  height: 180px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.ats-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.ats-submit-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--accent);
+  color: var(--bg-deep);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.ats-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ats-error {
+  color: var(--danger);
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* Results layout */
+.ats-results {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ats-score-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+@media (max-width: 650px) {
+  .ats-score-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.ats-score-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 6px solid;
+  flex-shrink: 0;
+}
+
+.ats-score-circle.score-green { border-color: var(--accent); color: var(--accent); }
+.ats-score-circle.score-amber { border-color: var(--warning); color: var(--warning); }
+.ats-score-circle.score-red { border-color: var(--danger); color: var(--danger); }
+
+.ats-score-number {
+  font-size: 40px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.ats-score-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.ats-score-summary h2 {
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+
+.ats-score-summary p {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Component breakdown grid */
+.ats-components-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.ats-component-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.ats-comp-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.ats-comp-score {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ats-bar-bg {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ats-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+/* Keywords badges */
+.ats-keywords-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 650px) {
+  .ats-keywords-section { grid-template-columns: 1fr; }
+}
+
+.ats-keywords-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.ats-keywords-box h3 {
+  font-size: 16px;
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ats-badge-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ats-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.badge-matched {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-missing {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Feedback lists */
+.ats-feedback-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.ats-feedback-card h3 {
+  font-size: 16px;
+  margin: 0 0 16px;
+}
+
+.ats-feedback-card ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.ats-feedback-card li {
+  margin-bottom: 8px;
+}
+
+/* ATS Delta Badge */
+.ats-delta-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.ats-delta--up {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.ats-delta--down {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Language and Grammar Audit */
+.ats-language-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.ats-language-header h3 {
+  font-size: 18px;
+  margin: 4px 0 16px;
+}
+
+.ats-language-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ats-lang-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.ats-lang-box h4 {
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.ats-lang-list {
+  padding-left: 18px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.ats-lang-list li {
+  margin-bottom: 6px;
+}
+
+.ats-grammar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ats-grammar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.ats-grammar-issue {
+  color: var(--warning);
+  font-weight: 500;
+}
+
+.ats-grammar-fix {
+  color: var(--text-muted);
+}
+
+/* Real Interview Alignment Card */
+.ats-alignment-card {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.06) 0%, rgba(59, 130, 246, 0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.ats-alignment-card h3 {
+  font-size: 18px;
+  margin: 4px 0 6px;
+}
+
+.ats-alignment-list {
+  padding-left: 20px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.ats-alignment-list li {
+  margin-bottom: 8px;
+}

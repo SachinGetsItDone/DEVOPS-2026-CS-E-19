@@ -10,21 +10,34 @@ import { login as apiLogin, register as apiRegister, getMe, getToken, setToken }
 
 const AuthContext = createContext(null)
 
+const GUEST_USER = {
+  id: '000000000000000000000001',
+  name: 'Guest Candidate',
+  email: 'guest@prepline.local',
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(GUEST_USER)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     if (!getToken()) {
+      setUser(GUEST_USER)
       setLoading(false)
       return
     }
+    setLoading(true)
     getMe()
-      .then((u) => !cancelled && setUser(u))
-      .catch(() => {
-        // Token expired or invalid — clear it rather than keep retrying.
-        if (!cancelled) setToken(null)
+      .then((u) => !cancelled && setUser(u || GUEST_USER))
+      .catch((err) => {
+        if (cancelled) return
+        // A token the server rejects is worse than no token: it makes every
+        // later request fail with a confusing 401. Drop it and fall back to
+        // guest. A network failure leaves the token alone so a flaky
+        // connection doesn't sign the user out.
+        if (err?.status === 401 || err?.status === 403) setToken(null)
+        setUser(GUEST_USER)
       })
       .finally(() => !cancelled && setLoading(false))
     return () => { cancelled = true }
@@ -46,7 +59,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => {
     setToken(null)
-    setUser(null)
+    setUser(GUEST_USER)
   }, [])
 
   return (

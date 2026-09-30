@@ -12,12 +12,21 @@ This repository combines a front-end interview experience with a backend-ready A
 
 ## Quick start
 
-### Frontend
+### Frontend (`client/`)
 
 ```bash
+cd client
 npm install
-npm run dev
+npm run dev    # Local development server at http://localhost:5173
+npm run build  # Production build with chunk splitting
 ```
+
+The frontend features:
+- **Interactive Three.js 3D Acoustic Waveform & Resonance Field**: Spatial acoustic diaphragm particle physics with hardware throttling and `prefers-reduced-motion` fallback.
+- **Antigravity Dual-Track Morphing Showcase**: Exact Google Antigravity aesthetic with clean canvas micro-dots, dynamic code bracket `{ }` morphing on Developer hover, and 6-ring flower constellation morphing on Organization hover.
+- **Asymmetric 12-Column Bento Grid**: Live acoustic cadence telemetry, VU meter, semantic resume × JD matching, and placement league HUD.
+- **ATS Keyword & Format Scorer**: Five-component breakdown (formatting, keywords, content, skill validation, ATS compatibility), keyword matrix, and bullet-point optimizer.
+- **Speech-Ready Interview Room & Evaluated Dossier**: Real-time microphone audio capture, dynamic turn exchange, behavioral speech pacing analysis, and pentagonal competency radar.
 
 ### Backend
 

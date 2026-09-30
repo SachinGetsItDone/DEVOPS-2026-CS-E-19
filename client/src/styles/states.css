@@ -1,0 +1,192 @@
+/* ============================================================
+   Shared page states: error, not-found, empty, loading, offline.
+   One authored treatment per state so they read as one product.
+   ============================================================ */
+
+/* --- the centred state panel used by crash / 404 / empty --- */
+.state {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: var(--s10);
+}
+
+.state__panel {
+  width: 100%;
+  max-width: 560px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  align-items: flex-start;
+}
+
+.state__title {
+  font-size: var(--t-h1);
+  letter-spacing: -0.03em;
+}
+
+.state__body {
+  color: var(--text-muted);
+  max-width: 46ch;
+}
+
+.state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  margin-top: var(--s2);
+}
+
+/* --- error boundary --- */
+.crash {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s8) var(--page-gutter);
+  background: var(--bg);
+}
+
+.crash__panel {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  align-items: flex-start;
+}
+
+.crash__title { font-size: var(--t-h1); letter-spacing: -0.03em; }
+
+.crash__body { color: var(--text-muted); max-width: 50ch; }
+
+.crash__detail {
+  width: 100%;
+  margin: 0;
+  padding: var(--s4);
+  background: var(--bg-deep);
+  border: 1px solid var(--danger);
+  border-radius: var(--r-sm);
+  color: #ffb3b3;
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.crash__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+/* --- 404 --- */
+.notfound__code {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.notfound__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  margin-top: var(--s4);
+  width: 100%;
+  border-top: 1px solid var(--border);
+  padding-top: var(--s4);
+}
+
+.notfound__link {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--border);
+  transition: color var(--dur) var(--ease-out-expo);
+}
+.notfound__link:last-child { border-bottom: 0; }
+.notfound__link:hover { color: var(--amber); }
+.notfound__link strong { font-weight: 600; }
+.notfound__link span { color: var(--text-muted); font-size: var(--t-sm); }
+
+/* --- empty --- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s9) var(--s6);
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.empty__title { font-size: var(--t-h4); font-family: var(--font-body); font-weight: 600; }
+.empty__body { color: var(--text-muted); font-size: var(--t-sm); max-width: 44ch; }
+
+/* --- loading: a skeleton with a real shimmer, not a spinner --- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-high);
+  border-radius: var(--r-sm);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(236, 233, 226, 0.06),
+    transparent
+  );
+  animation: skeleton-sweep 1.4s var(--ease-out-expo) infinite;
+}
+@keyframes skeleton-sweep {
+  100% { transform: translateX(100%); }
+}
+.skeleton--line { height: 12px; }
+.skeleton--title { height: 26px; }
+.skeleton--block { height: 96px; }
+
+.loading-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  width: 100%;
+}
+
+/* --- the "server is down" banner: one honest signal, site-wide --- */
+.offline-banner {
+  background: var(--danger-ghost);
+  border-bottom: 1px solid var(--danger);
+  color: var(--text);
+}
+.offline-banner__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  padding-block: var(--s3);
+  font-size: var(--t-sm);
+}
+.offline-banner__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--danger);
+  flex: none;
+}
+.offline-banner code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+}

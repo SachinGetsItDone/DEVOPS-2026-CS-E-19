@@ -5,18 +5,58 @@
 
 .leaderboard {
   padding: 48px 32px 96px;
-  max-width: 640px;
+  max-width: 760px;
+}
+
+.leaderboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .leaderboard h1 {
   font-size: 34px;
-  margin: 8px 0 32px;
+  margin-top: 6px;
+}
+
+.leaderboard__meta-legend {
+  display: flex;
+  align-items: center;
+}
+
+.legend-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--live);
+  background: rgba(var(--live-rgb), 0.08);
+  border: 1px solid rgba(var(--live-rgb), 0.22);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.leaderboard__empty-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 32px;
 }
 
 .leaderboard__empty {
   color: var(--text-muted);
   font-size: 14px;
-  padding: 40px 0;
+  line-height: 1.6;
+}
+
+.login-link {
+  color: var(--amber);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .leaderboard__empty--error {
@@ -24,26 +64,242 @@
   font-family: var(--font-mono);
 }
 
+/* ----------------------------------------------------
+   Visual 1: Personal League Trajectory Barometer
+   ---------------------------------------------------- */
+
+.user-trajectory-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--amber);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.5);
+}
+
+.trajectory-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.trajectory-rank-val {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.trajectory-league-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  background: var(--amber-ghost);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.trajectory-xp-val {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--amber);
+  margin-top: 4px;
+}
+
+.trajectory-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trajectory-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.trajectory-track {
+  height: 6px;
+  background: var(--surface-high);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.trajectory-fill {
+  display: block;
+  height: 100%;
+  background: var(--amber);
+  border-radius: 999px;
+  transition: width 0.8s var(--ease-spring);
+}
+
+/* ----------------------------------------------------
+   Visual 2: The Top 3 Podium Showcase
+   ---------------------------------------------------- */
+
+.podium-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+
+.podium-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  position: relative;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+.podium-card:hover {
+  transform: translateY(-3px);
+}
+
+.podium-card--gold {
+  background: var(--surface);
+  border-color: rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 16px 40px -12px rgba(var(--accent-rgb), 0.15);
+  padding-top: 32px;
+  padding-bottom: 26px;
+}
+
+.podium-crest {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.podium-rank-badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--surface-high);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.podium-rank-badge--gold {
+  background: var(--amber);
+  color: var(--bg);
+  border-color: var(--amber);
+}
+
+.podium-name {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podium-name--gold {
+  font-size: 17px;
+}
+
+.podium-league {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.podium-league--gold { color: var(--amber); }
+
+.podium-xp {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.podium-xp--gold {
+  color: var(--amber);
+  font-size: 15px;
+}
+
+/* ----------------------------------------------------
+   General Leaderboard Table Listing
+   ---------------------------------------------------- */
+
 .leaderboard__list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.leaderboard__list-header {
+  display: grid;
+  grid-template-columns: 50px 1fr 120px 100px;
+  gap: 14px;
+  padding: 12px 20px;
+  background: var(--surface-high);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
 }
 
 .leaderboard__row {
   display: grid;
-  grid-template-columns: 40px 1fr auto auto;
+  grid-template-columns: 50px 1fr 120px 100px;
   align-items: center;
   gap: 14px;
-  padding: 14px 18px;
+  padding: 14px 20px;
   background: var(--surface);
+  border-bottom: 1px solid rgba(94, 207, 168, 0.05);
+  transition: background 0.15s ease;
+}
+
+.leaderboard__row:last-child {
+  border-bottom: none;
+}
+
+.leaderboard__row:hover {
+  background: var(--surface-high);
 }
 
 .leaderboard__row--me {
-  background: var(--accent-dim);
+  background: var(--amber-ghost);
+  box-shadow: inset 3px 0 0 var(--amber);
 }
 
 .leaderboard__rank {
@@ -54,6 +310,8 @@
 
 .leaderboard__name {
   font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .leaderboard__league {
@@ -63,18 +321,59 @@
   letter-spacing: 0.08em;
   padding: 3px 8px;
   border-radius: 999px;
-  background: var(--surface-2);
+  background: var(--surface-high);
   color: var(--text-muted);
+  width: fit-content;
 }
 
-.leaderboard__league--gold { color: #e8a33d; }
-.leaderboard__league--silver { color: #b8bcc4; }
+.leaderboard__league--gold { color: var(--amber); }
+.leaderboard__league--silver { color: var(--text); }
 .leaderboard__league--platinum { color: var(--live); }
+.leaderboard__league--diamond { color: #818cf8; }
 
 .leaderboard__xp {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--accent);
-  min-width: 56px;
+  color: var(--amber);
   text-align: right;
+  font-weight: 500;
+}
+
+/* Skeleton loader */
+.leaderboard__row--skeleton { pointer-events: none; }
+
+.sk {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-high) 25%, var(--border) 50%, var(--surface-high) 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.sk--rank { width: 28px; }
+.sk--name { width: 45%; height: 13px; }
+.sk--league { width: 64px; height: 18px; border-radius: 999px; }
+.sk--xp { width: 52px; margin-left: auto; }
+
+@keyframes sk-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (max-width: 680px) {
+  .podium-showcase { grid-template-columns: 1fr; }
+  .podium-card--gold { order: -1; }
+  .leaderboard__list-header, .leaderboard__row {
+    grid-template-columns: 40px 1fr 80px;
+  }
+  .leaderboard__list-header span:nth-child(3),
+  .leaderboard__row .leaderboard__league {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk { animation: none; }
+  .podium-card { transition: none; }
 }

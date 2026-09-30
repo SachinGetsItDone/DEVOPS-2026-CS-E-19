@@ -1,18 +1,12 @@
 /**
- * Thin client for the Node/Express backend (server/src/*).
+ * Client for the Prepline Express backend.
  *
- * The backend was migrated from Python/FastAPI to Node/Express on
- * 2026-09-21 (commit 5a64773) — this file matches THAT backend, not the
- * old one. Notable differences from the old contract:
- * - Almost every route requires a JWT: `Authorization: Bearer <token>`.
- * - The report shape uses `weaknesses`/`roadmap` (not `gaps`/`competencies`).
- * - Progress (XP/streak/league) is computed server-side from real turns —
- *   the client can only read it, and can only write `avatar`/`theme`.
- *
- * Base URL resolution: VITE_API_URL is left blank on purpose — with no
- * value, requests go to relative paths (`/api/...`) handled by the Vite
- * dev proxy (see vite.config.js) or, in production, whatever reverse
- * proxy sits in front of the built client.
+ * Every function here talks to the real API and surfaces real failures.
+ * There is deliberately no offline simulation: an earlier version of this
+ * file fabricated a login for any password, invented résumé skills, and
+ * returned a graded 8.2/10 interview report when the server was down. A
+ * candidate cannot tell a fake score from a real one, so a failed request
+ * must look like a failed request.
  */
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
@@ -27,13 +21,20 @@ export function setToken(token) {
   else localStorage.removeItem(TOKEN_KEY)
 }
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(message, status) {
     super(message)
     this.name = 'ApiError'
     this.status = status
   }
+  /** The server never answered — a network/DNS/CORS failure, not a rejection. */
+  get isOffline() {
+    return this.status === 0
+  }
 }
+
+const OFFLINE_MESSAGE =
+  "Can't reach the Prepline server. Start it with `npm start` in the server folder, then try again."
 
 async function parseJsonSafely(response) {
   const text = await response.text()
@@ -54,13 +55,13 @@ async function request(path, options = {}) {
   try {
     response = await fetch(`${API_BASE}${path}`, { ...options, headers })
   } catch {
-    throw new ApiError("Couldn't reach the server. Is the backend running?", 0)
+    throw new ApiError(OFFLINE_MESSAGE, 0)
   }
 
   const data = await parseJsonSafely(response)
 
   if (!response.ok) {
-    const message = data?.error || `Request failed (${response.status})`
+    const message = data?.error || data?.detail || `Request failed (${response.status})`
     throw new ApiError(message, response.status)
   }
   return data
@@ -70,27 +71,44 @@ function jsonBody(obj) {
   return { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(obj) }
 }
 
+// ---------- Health ----------
+
+/**
+ * Is the API reachable? Used to show an honest "server offline" banner
+ * instead of letting every action fail one at a time.
+ *
+ * The path must sit under /api: the dev server proxies only /api and /ws, and
+ * serves index.html for anything else — so probing a bare path would return
+ * 200 text/html and report the API healthy while it was down.
+ */
+export async function checkHealth() {
+  try {
+    const res = await fetch(`${API_BASE}/api/health`, { headers: { Accept: 'application/json' } })
+    if (!res.ok) return false
+    return (res.headers.get('content-type') || '').includes('application/json')
+  } catch {
+    return false
+  }
+}
+
 // ---------- Auth ----------
 
-/** Register a new account. Returns { token, user }. */
 export async function register({ email, password, name }) {
   return request('/api/auth/register', { method: 'POST', ...jsonBody({ email, password, name }) })
 }
 
-/** Log in. Returns { token, user }. */
 export async function login({ email, password }) {
   return request('/api/auth/login', { method: 'POST', ...jsonBody({ email, password }) })
 }
 
-/** Fetch the current user from the stored token. Throws ApiError(401) if invalid/expired. */
 export async function getMe() {
   const data = await request('/api/auth/me', { method: 'GET' })
-  return data.user
+  return data?.user ?? null
 }
 
-// ---------- Resume / JD ----------
+// ---------- Resume / JD / ATS ----------
 
-/** Upload a resume file (PDF only), get back extracted plain text. Does not require auth. */
+/** Extract plain text from a résumé PDF. Throws if the PDF has no text layer. */
 export async function parseResume(file) {
   const formData = new FormData()
   formData.append('file', file)
@@ -98,9 +116,34 @@ export async function parseResume(file) {
   return data?.text || ''
 }
 
+/** Analyse a job description into structured requirements. Requires auth. */
+export async function analyzeJd(jdText) {
+  return request('/api/jd/analyze', { method: 'POST', ...jsonBody({ jd_text: jdText }) })
+}
+
+/**
+ * Score a résumé against a job description.
+ * Response: { ATS_score, component_scores{formatting, keywords, content,
+ * skill_validation, ats_compatibility}, matched_keywords[], missing_keywords[],
+ * language_analysis{weak_verbs[], buzzwords[], grammar_improvements[]},
+ * strengths[], critical_issues[], suggestions[], real_interview_alignment[],
+ * score_delta }
+ */
+export async function calculateAts({ file, resumeText, jdText }) {
+  const formData = new FormData()
+  if (file) formData.append('file', file)
+  if (resumeText) formData.append('resume_text', resumeText)
+  if (jdText) formData.append('jd_text', jdText)
+  return request('/api/ats/calculate', { method: 'POST', body: formData })
+}
+
 // ---------- Interview flow ----------
 
-/** Create an interview: generates the first question from role/resume/JD. */
+/**
+ * Open a session. Requires auth.
+ * Response: { interview_id, role, first_question, engine, sts_model,
+ * sts_latency_ms, sts_audio_base64 }
+ */
 export async function createInterview({ role, jdText, resumeText, difficulty }) {
   return request('/api/interviews', {
     method: 'POST',
@@ -114,17 +157,17 @@ export async function createInterview({ role, jdText, resumeText, difficulty }) 
 }
 
 /**
- * Send one turn: either a recorded answer (audioBlob) or typed text
- * (transcript). Audio transcription only works if the backend has
- * NVIDIA_API_KEY configured — otherwise the backend itself returns a 400
- * asking for a transcript instead.
+ * Submit one answer. Send audio when we have it, transcript when we don't.
+ * Response: { user_transcript, evaluation, response_text, turn_number,
+ * xp_earned, sts_* }
  */
 export async function submitTurn({ interviewId, audioBlob, transcript }) {
+  if (!interviewId) throw new ApiError('No interview session is open.', 400)
+
   const formData = new FormData()
-  if (interviewId) formData.append('interview_id', interviewId)
+  formData.append('interview_id', interviewId)
   if (audioBlob) formData.append('audio_file', audioBlob, 'answer.webm')
   if (transcript) formData.append('transcript', transcript)
-
   return request('/api/interview/turn', { method: 'POST', body: formData })
 }
 
@@ -133,26 +176,21 @@ export async function getInterviews({ page = 1, limit = 20 } = {}) {
   return request(`/api/interviews?page=${page}&limit=${limit}`, { method: 'GET' })
 }
 
-/** Generate (or fetch the cached) post-interview report. */
+/** Generate (POST) or fetch (GET) the report for a finished session. */
 export async function generateReport(interviewId) {
   return request(`/api/interviews/${interviewId}/report`, { method: 'POST' })
 }
 
-/** Fetch a previously generated report (404s if not generated yet). */
 export async function getReport(interviewId) {
   return request(`/api/interviews/${interviewId}/report`, { method: 'GET' })
 }
 
-// ---------- Gamification ----------
+// ---------- Progression ----------
 
-/** Fetch the logged-in user's XP/streak/league state. */
 export async function getUserProgress() {
   return request('/api/user/progress', { method: 'GET' })
 }
 
-/** Weekly XP leaderboard (array, already sorted by XP desc). */
 export async function getLeaderboard(limit = 20) {
   return request(`/api/leaderboard?limit=${limit}`, { method: 'GET' })
 }
-
-export { ApiError }

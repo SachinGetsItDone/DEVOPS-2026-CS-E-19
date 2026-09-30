@@ -17,11 +17,27 @@ const InterviewSessionContext = createContext(null)
 
 const STORAGE_KEY = 'prepline_session'
 
-export function InterviewSessionProvider({ children }) {
-  const [session, setSession] = useState(() => {
+/** Corrupt or half-written sessionStorage must not take the whole app down. */
+function readStoredSession() {
+  try {
     const raw = sessionStorage.getItem(STORAGE_KEY)
     return raw ? JSON.parse(raw) : null
-  })
+  } catch {
+    sessionStorage.removeItem(STORAGE_KEY)
+    return null
+  }
+}
+
+function writeStoredSession(value) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // Private mode or quota exceeded — the in-memory session still works.
+  }
+}
+
+export function InterviewSessionProvider({ children }) {
+  const [session, setSession] = useState(readStoredSession)
   const [isStarting, setIsStarting] = useState(false)
   const [startError, setStartError] = useState('')
 
@@ -30,7 +46,13 @@ export function InterviewSessionProvider({ children }) {
     setStartError('')
 
     try {
-      const resumeText = resumeFile ? await parseResume(resumeFile) : ''
+      let resumeText = ''
+      if (resumeFile) {
+        // Let a parse failure surface. Passing a filename through as though it
+        // were résumé text makes the interviewer ask questions about a string
+        // like "resume.pdf", which is worse than an honest error.
+        resumeText = await parseResume(resumeFile)
+      }
       const { interview_id, first_question, role: resolvedRole } = await createInterview({
         role,
         jdText: jobDescription,
@@ -48,7 +70,7 @@ export function InterviewSessionProvider({ children }) {
       }
       setSession(next)
       // Files can't be JSON-serialized; only metadata + extracted text persist.
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      writeStoredSession(next)
       return next
     } catch (err) {
       const message = err instanceof ApiError
@@ -63,7 +85,11 @@ export function InterviewSessionProvider({ children }) {
 
   const clearSession = useCallback(() => {
     setSession(null)
-    sessionStorage.removeItem(STORAGE_KEY)
+    try {
+      sessionStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // Nothing to do — the in-memory session is already cleared.
+    }
   }, [])
 
   return (

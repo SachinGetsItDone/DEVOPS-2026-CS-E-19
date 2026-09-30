@@ -1,0 +1,357 @@
+/* ============================================================
+   Bento Grid — Asymmetric 12-Column Layout Architecture
+   Light theme: subtle shadows, crisp borders, violet accent glow.
+   ============================================================ */
+
+.bento-section {
+  padding-block: var(--s11);
+}
+
+.section-head {
+  margin-bottom: var(--s9);
+  max-width: 64ch;
+}
+
+.section-head .eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--s2);
+}
+
+.section__sub {
+  color: var(--text-muted);
+  font-size: var(--t-body-lg);
+  margin-top: var(--s3);
+  line-height: 1.6;
+}
+
+/* 12-Column Responsive Bento Grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--s6);
+}
+
+/* Bento Card Shell */
+.bento-card {
+  position: relative;
+  grid-column: span 4;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 4px;
+  transition: border-color var(--dur) var(--ease-out-expo), transform var(--dur) var(--ease-out-expo), box-shadow var(--dur) var(--ease-out-expo);
+}
+
+.bento-card:hover {
+  border-color: rgba(232, 96, 60, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px rgba(232, 96, 60, 0.08);
+}
+
+/* Inner Core */
+.bento-card__inner {
+  background: var(--surface);
+  border: 1px solid rgba(var(--accent-rgb), 0.04);
+  border-radius: calc(var(--r-lg) - 3px);
+  padding: var(--s6);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* 8-Column Hero Card */
+.bento-card--large {
+  grid-column: span 8;
+}
+
+.bento-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s4);
+}
+
+.bento-card__title {
+  font-size: var(--t-h3);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text);
+  margin-top: var(--s2);
+}
+
+.bento-card__desc {
+  font-size: var(--t-sm);
+  color: var(--text-muted);
+  margin-top: var(--s1);
+  line-height: 1.5;
+}
+
+/* Telemetry box inside 8-col card */
+.bento-visualizer-box {
+  margin-block: var(--s5);
+  padding: var(--s4);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.telemetry-bar-info {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--text-faint);
+  margin-bottom: var(--s3);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.telemetry-bar-info strong {
+  color: var(--live);
+}
+
+.bento-card__footer-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--border);
+}
+
+.metric-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-chip__label {
+  font-size: var(--t-xs);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.metric-chip__value {
+  font-size: var(--t-body-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Status Indicator Dot */
+.status-indicator {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: background-color var(--dur);
+}
+
+.status-indicator--active {
+  background: var(--live);
+  box-shadow: 0 0 8px var(--live);
+}
+
+/* Radar Tags in Card 2 */
+.radar-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-block: var(--s5);
+}
+
+.skill-pill {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  padding: 4px 8px;
+  border-radius: var(--r-xs);
+}
+
+.skill-pill--matched {
+  background: rgba(16, 185, 129, 0.08);
+  color: var(--live);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.skill-pill--gap {
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.radar-match-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--t-sm);
+  color: var(--text-muted);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border);
+}
+
+.radar-match-score strong {
+  font-size: var(--t-h3);
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+/* Pacing HUD in Card 3 */
+.pacing-hud {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  margin-block: var(--s5);
+}
+
+.pacing-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--live);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.pacing-val {
+  font-size: var(--t-h3);
+  font-weight: 700;
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.pacing-unit {
+  font-size: var(--t-xs);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+.pacing-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.pacing-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--t-xs);
+  color: var(--text-muted);
+}
+
+.text-success {
+  color: var(--live);
+}
+
+/* Score bars in Card 4 */
+.score-bars-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  margin-block: var(--s5);
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s1);
+  font-size: var(--t-xs);
+}
+
+.score-row .meter {
+  grid-column: span 2;
+  margin-top: 2px;
+}
+
+.score-val {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* League preview in Card 5 */
+.league-preview-box {
+  margin-block: var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.league-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.league-icon {
+  font-size: 1.8rem;
+  background: var(--surface-high);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+}
+
+.league-sub {
+  display: block;
+  font-size: var(--t-xs);
+  color: var(--text-muted);
+}
+
+.league-progress-track {
+  height: 6px;
+  background: var(--surface-high);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.league-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--live));
+  border-radius: var(--r-pill);
+}
+
+.league-stats-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--t-xs);
+  color: var(--text-muted);
+}
+
+/* Responsive Collapse below 1024px and 768px */
+@media (max-width: 1024px) {
+  .bento-card--large {
+    grid-column: span 12;
+  }
+  .bento-card {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 680px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-card, .bento-card--large {
+    grid-column: span 1;
+  }
+  .bento-card__footer-metrics {
+    grid-template-columns: 1fr;
+    gap: var(--s2);
+  }
+}

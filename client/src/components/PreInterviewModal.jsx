@@ -29,10 +29,12 @@ export default function PreInterviewModal({ open, onClose, onSubmit, isSubmittin
   function handleSubmit(e) {
     e.preventDefault()
     if (isSubmitting) return
-    if (!resumeFile) return setError('Add your resume to continue.')
-    if (!jobDescription.trim()) return setError('Paste the job description to continue.')
     setError('')
-    onSubmit({ resumeFile, jobDescription, role })
+    onSubmit({
+      resumeFile,
+      jobDescription: jobDescription.trim() || 'Software engineering background and technical problem solving.',
+      role: role.trim() || 'Software Engineer',
+    })
   }
 
   return (
