@@ -101,6 +101,20 @@
   --lift-2: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.06);
   --lift-3: 0 10px 20px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.04);
 }
+[data-theme="dark"] {
+  --bg: #121212;
+  --bg-deep: #1a1a1a;
+  --surface: #1e1e1e;
+  --surface-high: #252525;
+  --surface-raised: #2d2d2d;
+
+  --border: #3a3a3a;
+  --border-strong: #555555;
+
+  --text: #f5f5f5;
+  --text-muted: #b5b5b5;
+  --text-faint: #888888;
+}
 
 * { box-sizing: border-box; }
 
@@ -416,4 +430,31 @@ code, kbd, samp, pre {
 
 @media (max-width: 400px) {
   :root { --page-gutter: 1rem; }
+}
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+
+  background: var(--surface);
+  color: var(--text);
+
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  transition:
+    background-color var(--dur) var(--ease-out-expo),
+    color var(--dur) var(--ease-out-expo),
+    border-color var(--dur) var(--ease-out-expo);
+}
+
+.theme-toggle:hover {
+  background: var(--surface-high);
+  border-color: var(--accent);
 }

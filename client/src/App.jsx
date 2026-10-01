@@ -1,3 +1,4 @@
+import ThemeToggle from './components/ThemeToggle.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { InterviewSessionProvider } from './context/InterviewSessionContext.jsx'
@@ -23,6 +24,7 @@ export default function App() {
         <InterviewSessionProvider>
           <BrowserRouter>
             <RouteChange />
+            <ThemeToggle />
             <a className="skip-link" href="#main">
               Skip to content
             </a>
