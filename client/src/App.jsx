@@ -1,4 +1,4 @@
-import ThemeToggle from './components/ThemeToggle.jsx'
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { InterviewSessionProvider } from './context/InterviewSessionContext.jsx'
@@ -6,6 +6,8 @@ import { GameProvider } from './context/GameContext.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
 import RouteChange from './components/RouteChange.jsx'
+import ThemeToggle from './components/ThemeToggle.jsx'
+import SettingsPanel from './components/SettingsPanel.jsx'
 import Home from './pages/Home.jsx'
 import HowItWorks from './pages/HowItWorks.jsx'
 import Login from './pages/Login.jsx'
@@ -18,17 +20,36 @@ import AtsCalculator from './pages/AtsCalculator.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 export default function App() {
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
   return (
     <AuthProvider>
       <GameProvider>
         <InterviewSessionProvider>
           <BrowserRouter>
             <RouteChange />
+
             <ThemeToggle />
+
+            <button
+              type="button"
+              className="settings-open-button"
+              onClick={() => setSettingsOpen(true)}
+              aria-label="Open settings"
+            >
+              ⚙️ Settings
+            </button>
+
+            {settingsOpen && (
+              <SettingsPanel onClose={() => setSettingsOpen(false)} />
+            )}
+
             <a className="skip-link" href="#main">
               Skip to content
             </a>
+
             <OfflineBanner />
+
             <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<Home />} />

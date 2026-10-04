@@ -458,3 +458,215 @@ code, kbd, samp, pre {
   background: var(--surface-high);
   border-color: var(--accent);
 }
+/* Settings Panel */
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.settings-panel {
+  width: min(380px, 100%);
+  min-height: 100%;
+  padding: 2rem;
+  background: var(--surface);
+  color: var(--text);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--lift-3);
+  animation: settings-slide-in 220ms var(--ease-out-expo);
+}
+
+.settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.settings-header h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+}
+
+.settings-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.settings-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-high);
+  color: var(--text);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.settings-section {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section h3 {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+}
+
+.settings-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.settings-option {
+  flex: 1;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-high);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.settings-option--active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.settings-toggle {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-high);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.settings-toggle--active {
+  border-color: var(--live);
+}
+
+.settings-reset {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.settings-reset:hover,
+.settings-close:hover,
+.settings-option:hover,
+.settings-toggle:hover {
+  border-color: var(--accent);
+}
+
+@keyframes settings-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+[data-font-size="small"] {
+  font-size: 14px;
+}
+
+[data-font-size="medium"] {
+  font-size: 16px;
+}
+
+[data-font-size="large"] {
+  font-size: 18px;
+}
+
+[data-animations="off"] *,
+[data-animations="off"] *::before,
+[data-animations="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+.settings-open-button {
+  position: fixed;
+  top: 4.5rem;
+  right: 1rem;
+  z-index: 1000;
+
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+
+  background: var(--surface);
+  color: var(--text);
+
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  transition:
+    background-color var(--dur) var(--ease-out-expo),
+    color var(--dur) var(--ease-out-expo),
+    border-color var(--dur) var(--ease-out-expo);
+}
+
+.settings-open-button:hover {
+  background: var(--surface-high);
+  border-color: var(--accent);
+}
+/* Settings animations */
+
+.settings-section {
+  animation: settings-fade-up 300ms var(--ease-out-expo);
+}
+
+.settings-option,
+.settings-toggle,
+.settings-reset,
+.settings-close {
+  transition:
+    transform 180ms var(--ease-out-expo),
+    background-color var(--dur) var(--ease-out-expo),
+    border-color var(--dur) var(--ease-out-expo),
+    color var(--dur) var(--ease-out-expo);
+}
+
+.settings-option:hover,
+.settings-toggle:hover,
+.settings-reset:hover {
+  transform: translateY(-2px);
+}
+
+.settings-close:hover {
+  transform: rotate(90deg);
+}
+
+@keyframes settings-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
