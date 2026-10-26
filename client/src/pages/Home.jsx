@@ -4,8 +4,6 @@ import Navbar from '../components/Navbar.jsx'
 import PreInterviewModal from '../components/PreInterviewModal.jsx'
 import { useInterviewSession } from '../context/InterviewSessionContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import AntigravityField from '../components/AntigravityField.jsx'
-// import ThreeHeroScene from '../components/ThreeHeroScene.jsx' // previous hero bg — swap back to revert
 import BentoGrid from '../components/BentoGrid.jsx'
 import AntigravitySolutions from '../components/AntigravitySolutions.jsx'
 import MagneticButton from '../components/MagneticButton.jsx'
@@ -61,11 +59,6 @@ export default function Home() {
 
       {/* Hero Section with Interactive 3D Acoustic Field */}
       <section className="hero-frame container">
-        {/* Cursor-reactive dash field (Google-Antigravity-style halo).
-            Replaces the 3D desk scene as the hero background — content,
-            layout, and buttons above it are untouched. To revert, swap
-            <AntigravityField /> back to <ThreeHeroScene />. */}
-        <AntigravityField />
         <div className="hero-frame__corner hero-frame__corner--tl">Prepline / study room</div>
         <div className="hero-frame__corner hero-frame__corner--tr">Practice engine</div>
 

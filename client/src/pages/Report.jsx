@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useParams, useLocation, useNavigate, Link } from 'react-router-dom'
-import confetti from 'canvas-confetti'
 import Navbar from '../components/Navbar.jsx'
 import { useGame } from '../context/GameContext.jsx'
 import { getReport, generateReport, ApiError } from '../lib/api.js'
@@ -15,22 +14,6 @@ export default function Report() {
   const [report, setReport] = useState(location.state?.report ?? null)
   const [status, setStatus] = useState(location.state?.report ? 'ready' : 'loading')
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (status === 'ready' && report && (Number(report.overall_score) >= 7.0)) {
-      try {
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        if (!reduced) {
-          confetti({
-            particleCount: 45,
-            spread: 65,
-            origin: { y: 0.65 },
-            colors: ['#5ecfa8', '#38bdf8', '#e6ece7'],
-          })
-        }
-      } catch {}
-    }
-  }, [status, report])
 
   useEffect(() => {
     if (report) return // Passed in directly from InterviewRoom — no fetch needed.

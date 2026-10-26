@@ -48,9 +48,9 @@
 }
 
 .bento-card:hover {
-  border-color: rgba(232, 96, 60, 0.18);
+  border-color: rgba(var(--accent-rgb), 0.22);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -8px rgba(232, 96, 60, 0.08);
+  box-shadow: 0 8px 24px -8px rgba(var(--accent-rgb), 0.12);
 }
 
 /* Inner Core */

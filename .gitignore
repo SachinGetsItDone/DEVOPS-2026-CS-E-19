@@ -29,6 +29,8 @@ graphify-out/
 # Local-only audit notes and AI scratch files (never commit)
 ISSUES_AUDIT.md
 ANTIGRAVITY_SITE_ANALYSIS.md
+TO_DO_Tasks/
+cleanup_tasks/
 scratch*.js
 *.tmp
 *.log

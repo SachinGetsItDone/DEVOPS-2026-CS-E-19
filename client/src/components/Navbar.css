@@ -18,7 +18,7 @@
 .navbar--scrolled {
   padding: 12px 0;
   background: color-mix(in srgb, var(--surface) 96%, transparent);
-  border-bottom-color: rgba(232, 96, 60, 0.1);
+  border-bottom-color: rgba(var(--accent-rgb), 0.12);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
@@ -48,7 +48,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(232, 96, 60, 0.4);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
 }
 
 .navbar__badge {

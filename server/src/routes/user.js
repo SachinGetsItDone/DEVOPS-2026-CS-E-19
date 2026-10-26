@@ -14,8 +14,6 @@ function progressPayload(p) {
     xp: p.xp,
     weekly_xp: p.weekly_xp,
     streak: p.streak,
-    gems: p.gems,
-    hearts: p.hearts,
     league: p.league,
     achievements: p.achievements,
     interviews_completed: p.interviews_completed,
@@ -39,7 +37,7 @@ router.get(
   })
 );
 
-// Only cosmetic preferences are client-writable. XP, streaks, gems, hearts,
+// Only cosmetic preferences are client-writable. XP, streaks,
 // league and achievements are computed server-side from real interview turns,
 // which is what keeps the leaderboard honest.
 router.post(

@@ -41,7 +41,7 @@ if (!jwtSecret) {
 
 const config = {
   PORT: int('PORT', 8000),
-  CORS_ORIGINS: str('CORS_ORIGIN', 'http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean),
+  CORS_ORIGINS: str('CORS_ORIGIN', 'http://localhost:5173,http://127.0.0.1:5173').split(',').map((s) => s.trim()).filter(Boolean),
   JWT_SECRET: jwtSecret,
   JWT_EPHEMERAL_SECRET: ephemeralSecret,
   JWT_EXPIRES_IN: str('JWT_EXPIRES_IN', '24h'),

@@ -57,8 +57,8 @@ export default function LiveAcousticVisualizer({
 
       step += 0.08
       const barWidth = Math.max(3, (width - (barCount - 1) * 3) / barCount)
-      const accent = theme === 'teal' ? '#10b981' : '#e8603c'
-      const dimAccent = theme === 'teal' ? 'rgba(16, 185, 129, 0.18)' : 'rgba(232, 96, 60, 0.14)'
+      const accent = theme === 'teal' ? '#10b981' : '#0284c7'
+      const dimAccent = theme === 'teal' ? 'rgba(16, 185, 129, 0.18)' : 'rgba(2, 132, 199, 0.16)'
 
       if (analyser && dataArray) {
         analyser.getByteFrequencyData(dataArray)

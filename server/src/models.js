@@ -19,8 +19,6 @@ const ProgressSchema = new Schema(
     xp: { type: Number, default: 0, min: 0 },
     weekly_xp: { type: Number, default: 0, min: 0 },
     streak: { type: Number, default: 0, min: 0 },
-    gems: { type: Number, default: 0, min: 0 },
-    hearts: { type: Number, default: 5, min: 0, max: 5 },
     league: { type: String, default: 'bronze', enum: ['bronze', 'silver', 'gold', 'platinum', 'diamond'] },
     achievements: { type: [String], default: [] },
     interviews_completed: { type: Number, default: 0, min: 0 },

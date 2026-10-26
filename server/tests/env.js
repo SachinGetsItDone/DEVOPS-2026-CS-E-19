@@ -6,3 +6,5 @@ process.env.RAG_MODE = 'keyword'; // no model download in tests
 process.env.JWT_SECRET = 'jest-run-secret-not-for-production'; // must not start with "test": config.js treats that as a placeholder
 process.env.DEEPSEEK_API_KEY = '';
 process.env.NVIDIA_API_KEY = '';
+
+jest.setTimeout(30000);

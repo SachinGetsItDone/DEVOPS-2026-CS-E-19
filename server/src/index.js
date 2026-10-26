@@ -12,13 +12,13 @@ async function main() {
     console.log(`[db] connected to ${config.MONGO_DB}`);
   } catch (err) {
     console.error(`[db] cannot reach MongoDB at ${config.MONGO_URI}: ${err.message}`);
-    console.error('[db] start it with `docker compose up -d` from the repo root, then retry.');
+    console.error('[db] ensure MongoDB is running at the configured MONGO_URI, then retry.');
     process.exit(1);
   }
 
   const server = http.createServer(app);
   setupWebSocket(server);
-  server.listen(config.PORT, () => {
+  server.listen(config.PORT, '0.0.0.0', () => {
     console.log(`[api] listening on http://localhost:${config.PORT} (ws: /ws/interview)`);
   });
 

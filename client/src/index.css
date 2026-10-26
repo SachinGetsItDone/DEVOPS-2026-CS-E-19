@@ -1,8 +1,7 @@
 /* ============================================================
    Prepline — design tokens & base
    World: a clean, luminous white studio. Pure white canvas,
-   graphite ink, warm accents. Inspired by three.js skinning-ik
-   example — expansive white with soft atmospheric fog.
+   graphite ink, warm accents. Expansive white with soft atmospheric fog.
    ============================================================ */
 
 :root {
@@ -20,13 +19,13 @@
   --text-muted: #6b6966;   /* warm charcoal */
   --text-faint: #9c9893;   /* disabled / hints */
 
-  /* --- the signal: warm coral-orange — studious, warm, human --- */
-  --accent: #e8603c;       /* primary accent — warm terracotta/coral */
-  --accent-dark: #d14e2e;  /* pressed / hover-down */
-  --accent-hi: #f07858;    /* hover-up */
-  --accent-ghost: rgba(232, 96, 60, 0.06);
-  --accent-line: rgba(232, 96, 60, 0.22);
-  --accent-rgb: 232, 96, 60;
+  /* --- the signal: skyblue — Google Antigravity aesthetic --- */
+  --accent: #0284c7;       /* primary skyblue — crisp, vibrant, high-contrast */
+  --accent-dark: #0369a1;  /* pressed / hover-down */
+  --accent-hi: #38bdf8;    /* hover-up / glow */
+  --accent-ghost: rgba(2, 132, 199, 0.08);
+  --accent-line: rgba(2, 132, 199, 0.22);
+  --accent-rgb: 2, 132, 199;
 
   /* --- the microphone: reserved for live capture ONLY --- */
   --live: #10b981;

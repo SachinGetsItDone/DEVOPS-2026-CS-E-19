@@ -25,8 +25,6 @@ const DEFAULT_STATE = {
   xp: 0,
   weeklyXp: 0,
   streak: 0,
-  gems: 0,
-  hearts: 5,
   league: 'bronze',
   interviewsCompleted: 0,
 }
@@ -48,8 +46,6 @@ export function GameProvider({ children }) {
         xp: p.xp ?? 0,
         weeklyXp: p.weekly_xp ?? 0,
         streak: p.streak ?? 0,
-        gems: p.gems ?? 0,
-        hearts: p.hearts ?? 5,
         league: p.league ?? 'bronze',
         interviewsCompleted: p.interviews_completed ?? 0,
       })
