@@ -1,0 +1,17 @@
+# Prometheus Configuration for Mock Interview Platform (M6 Monitoring)
+# Scrapes the production backend API deployed on Render
+global:
+  scrape_interval: 15s      # Scrape targets every 15 seconds
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+
+scrape_configs:
+  - job_name: "mock-interview-api"
+    scheme: https
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["devops-2026-cs-e-19.onrender.com"]
+
+    # Note on Render Free Tier:
+    # Render free tier web services spin down after 15 minutes of inactivity.
+    # When spun down, Prometheus scrapes may experience cold start latency
+    # (typically 30-50 seconds) until the instance boots back up.

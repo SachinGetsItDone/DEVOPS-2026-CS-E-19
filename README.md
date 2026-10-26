@@ -4,6 +4,18 @@ An end-to-end full-stack MERN application that helps engineering students prepar
 
 ---
 
+## Live Deployment
+
+- **Backend API:** [https://devops-2026-cs-e-19.onrender.com](https://devops-2026-cs-e-19.onrender.com/)
+  - **API Root (`/`):** Accessing the root URL returns a JSON health confirmation confirming the Mock Interview Engine API is active:
+    ```json
+    {"message":"Mock Interview Engine API is running","engine":"DeepSeek LLM + NVIDIA STS with offline fallbacks","version":"3.0.0-mern"}
+    ```
+  - **Prometheus Metrics Endpoint (`/metrics`):** Accessing `https://devops-2026-cs-e-19.onrender.com/metrics` returns standard Prometheus-compatible plain-text metrics (`mock_interview_api_up 1`) used by Prometheus and Grafana for uptime monitoring.
+  - *Note on Render Free Tier:* Services spin down after 15 minutes of inactivity; the initial request may take 30–50 seconds while the instance wakes up.
+
+---
+
 ## Tech Stack (MERN)
 
 - **Frontend:** React 18, Vite, React Router 6, Canvas audio visualizers, CSS Design System

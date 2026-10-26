@@ -33,4 +33,16 @@ router.get('/version', (req, res) => {
   });
 });
 
+// Prometheus metrics endpoint for monitoring and health scraping
+router.get('/metrics', (req, res) => {
+  res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
+  const metrics = [
+    '# HELP mock_interview_api_up Indicates whether the Mock Interview API is running and operational (1 = up)',
+    '# TYPE mock_interview_api_up gauge',
+    'mock_interview_api_up 1',
+    '',
+  ].join('\n');
+  res.send(metrics);
+});
+
 module.exports = router;
