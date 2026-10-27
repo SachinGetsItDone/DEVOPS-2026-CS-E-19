@@ -9,7 +9,10 @@
  * must look like a failed request.
  */
 
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? 'https://devops-2026-cs-e-19.onrender.com' : '')
+).replace(/\/$/, '')
 const TOKEN_KEY = 'prepline_token'
 
 export function getToken() {
@@ -85,7 +88,10 @@ export async function checkHealth() {
   try {
     const res = await fetch(`${API_BASE}/api/health`, { headers: { Accept: 'application/json' } })
     if (!res.ok) return false
-    return (res.headers.get('content-type') || '').includes('application/json')
+    const ct = res.headers.get('content-type') || ''
+    if (!ct.includes('application/json')) return false
+    const data = await res.json().catch(() => null)
+    return Boolean(data && data.ok)
   } catch {
     return false
   }

@@ -3,6 +3,7 @@
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
+const { metricsMiddleware } = require('./metrics');
 const { rateLimit } = require('./middleware/rateLimit');
 const { notFound, errorHandler } = require('./middleware/errors');
 
@@ -15,16 +16,26 @@ const userRoutes = require('./routes/user');
 
 const app = express();
 
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  const cleanOrigin = origin.trim().replace(/\/$/, '');
+  if (config.CORS_ORIGINS.includes(cleanOrigin)) return true;
+  if (/^https:\/\/[a-zA-Z0-9.-]+\.vercel\.app$/.test(cleanOrigin)) return true;
+  return false;
+}
+
 // Explicit origins only. "No origin" (curl, server-to-server, tests) is allowed.
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || config.CORS_ORIGINS.includes(origin)) return callback(null, true);
+      if (isAllowedOrigin(origin)) return callback(null, true);
       return callback(new Error('Origin not allowed by CORS'));
     },
     credentials: true,
   })
 );
+
+app.use(metricsMiddleware);
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));

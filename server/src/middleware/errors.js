@@ -35,6 +35,10 @@ function errorHandler(err, req, res, next) {
     return res.status(503).json({ error: 'Database unavailable. Try again shortly.' });
   }
 
+  if (err && err.message === 'Origin not allowed by CORS') {
+    return res.status(403).json({ error: 'Origin not allowed by CORS.' });
+  }
+
   console.error('[error]', err);
   res.status(500).json({ error: 'Internal server error.' });
 }

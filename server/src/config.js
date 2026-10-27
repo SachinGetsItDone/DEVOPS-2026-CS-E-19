@@ -56,7 +56,7 @@ if (!model || (hasGroq && !deepseekKey && model === 'deepseek-chat')) {
 
 const config = {
   PORT: int('PORT', 8000),
-  CORS_ORIGINS: str('CORS_ORIGIN', 'http://localhost:5173,http://127.0.0.1:5173').split(',').map((s) => s.trim()).filter(Boolean),
+  CORS_ORIGINS: str('CORS_ORIGIN', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://devops-2026-cs-e-19.vercel.app').split(',').map((s) => s.trim().replace(/\/$/, '')).filter(Boolean),
   JWT_SECRET: jwtSecret,
   JWT_EPHEMERAL_SECRET: ephemeralSecret,
   JWT_EXPIRES_IN: str('JWT_EXPIRES_IN', '24h'),

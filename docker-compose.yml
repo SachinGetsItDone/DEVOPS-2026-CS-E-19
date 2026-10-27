@@ -1,3 +1,4 @@
+
 services:
   postgres:
     image: pgvector/pgvector:pg16
@@ -34,6 +35,24 @@ services:
     restart: unless-stopped
     depends_on:
       - mongo
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    depends_on:
+      - prometheus
 
 volumes:
   pgdata:
