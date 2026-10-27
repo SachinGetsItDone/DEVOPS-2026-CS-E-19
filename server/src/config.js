@@ -39,6 +39,21 @@ if (!jwtSecret) {
   jwtSecret = crypto.randomBytes(32).toString('hex');
 }
 
+const groqKey = str('GROQ_API_KEY');
+const deepseekKey = str('DEEPSEEK_API_KEY');
+const hasGroq = Boolean(groqKey);
+
+// If GROQ_API_KEY is configured, default to Groq endpoint even if DEEPSEEK_BASE_URL was left at https://api.deepseek.com
+let baseUrl = str('GROQ_BASE_URL') || str('DEEPSEEK_BASE_URL');
+if (!baseUrl || (hasGroq && !deepseekKey && baseUrl === 'https://api.deepseek.com')) {
+  baseUrl = hasGroq ? 'https://api.groq.com/openai/v1' : 'https://api.deepseek.com';
+}
+
+let model = str('GROQ_MODEL') || str('DEEPSEEK_MODEL');
+if (!model || (hasGroq && !deepseekKey && model === 'deepseek-chat')) {
+  model = hasGroq ? 'openai/gpt-oss-120b' : 'deepseek-chat';
+}
+
 const config = {
   PORT: int('PORT', 8000),
   CORS_ORIGINS: str('CORS_ORIGIN', 'http://localhost:5173,http://127.0.0.1:5173').split(',').map((s) => s.trim()).filter(Boolean),
@@ -49,10 +64,10 @@ const config = {
   MONGO_URI: str('MONGO_URI', 'mongodb://localhost:27017'),
   MONGO_DB: str('MONGO_DB', 'interview'),
 
-  GROQ_API_KEY: str('GROQ_API_KEY'),
-  DEEPSEEK_API_KEY: str('DEEPSEEK_API_KEY') || str('GROQ_API_KEY'),
-  DEEPSEEK_BASE_URL: str('DEEPSEEK_BASE_URL', str('GROQ_API_KEY') ? 'https://api.groq.com/openai/v1' : 'https://api.deepseek.com'),
-  DEEPSEEK_MODEL: str('DEEPSEEK_MODEL', str('GROQ_API_KEY') ? 'openai/gpt-oss-120b' : 'deepseek-chat'),
+  GROQ_API_KEY: groqKey,
+  DEEPSEEK_API_KEY: groqKey || deepseekKey,
+  DEEPSEEK_BASE_URL: baseUrl,
+  DEEPSEEK_MODEL: model,
 
   NVIDIA_API_KEY: str('NVIDIA_API_KEY'),
   NVIDIA_TTS_URL: str('NVIDIA_STS_BASE_URL', 'https://integrate.api.nvidia.com/v1'),

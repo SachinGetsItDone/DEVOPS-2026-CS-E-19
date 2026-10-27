@@ -60,7 +60,8 @@ class LLMService {
   }
 
   get engine() {
-    return this.client ? 'deepseek' : 'offline-heuristic';
+    if (!this.client) return 'offline-heuristic';
+    return (config.DEEPSEEK_BASE_URL || '').includes('groq.com') ? 'groq' : 'deepseek';
   }
 
   async chatJson(system, user) {
@@ -76,8 +77,12 @@ class LLMService {
         temperature: 0.3,
         max_tokens: 1200,
       });
-      const raw = res.choices?.[0]?.message?.content;
+      let raw = res.choices?.[0]?.message?.content;
       if (!raw) return null;
+      raw = raw.trim();
+      if (raw.startsWith('```')) {
+        raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+      }
       return JSON.parse(raw);
     } catch (err) {
       console.warn(`[llm] call failed, using fallback: ${err.message}`);
