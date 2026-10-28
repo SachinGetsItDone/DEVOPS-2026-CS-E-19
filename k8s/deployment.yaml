@@ -1,0 +1,22 @@
+                                                                                         
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-interview-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mock-interview-frontend
+  template:
+    metadata:
+      labels:
+        app: mock-interview-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: sachin29933/mock-interview-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+                                                                                                                                                                                                                                                                                                                                                                                 
